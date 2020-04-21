@@ -15,11 +15,11 @@ func createNetworkThread():
 func _thread_network_function(userdata):
 	var done=false
 	socket = PacketPeerUDP.new()
-	if (socket.listen(4000,"172.19.0.1") != OK):
+	if (socket.listen(4000,global.ipAddress) != OK):
 		print("An error occurred listening on port 4000")
 		done = true;
 	else:
-		print("Listening on port 4000 on 172.19.0.1")
+		print("Listening on port 4000 on "+global.ipAddress)
 	while (done!=true):
 		if(socket.get_available_packet_count() > 0):
 			var data = socket.get_packet().get_string_from_ascii()
@@ -39,7 +39,7 @@ func _on_ButtonJouer_pressed():
 	root.add_child(global.controlGameNode)
 	
 	var connectMessage="C"+str(global.direction)
-	socket.set_dest_address("172.19.0.1", 4242)
+	socket.set_dest_address(global.ipAddress, 4242)
 	socket.put_packet(connectMessage.to_ascii())
 
 func _on_ButtonOptions_pressed():
@@ -50,6 +50,6 @@ func _on_ButtonOptions_pressed():
 	root.add_child(global.controlOptionsNode)
 
 func _on_ButtonTestReseau_pressed():
-	print ("sending UDP test data to 172.19.0.1 port 4242")
-	socket.set_dest_address("172.19.0.1", 4242)
+	print ("sending UDP test data to "+global.ipAddress+" port 4242")
+	socket.set_dest_address(global.ipAddress, 4242)
 	socket.put_packet("lalala".to_ascii())

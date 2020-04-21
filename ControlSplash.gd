@@ -13,9 +13,9 @@ func _ready():
 	global.controlOptionsNode=load("res://ControlOptions.tscn").instance()
 	
 	global.ipAddress=str(IP.get_local_addresses()[2])
-	match global.ipAddress:
-		"172.19.0.1":
-			global.direction=0
+#	match global.ipAddress:
+#		" 127.0.1.1":
+#			global.direction=0
 	
 	print ("controlMenuNode=",global.controlMenuNode)
 	print ("controlGameNode=",global.controlGameNode)

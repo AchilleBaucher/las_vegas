@@ -1,17 +1,38 @@
-// Server side implementation of an UDP client-server model 
-#include <stdio.h> 
-#include <stdlib.h> 
-#include <unistd.h> 
-#include <string.h> 
-#include <sys/types.h> 
-#include <sys/socket.h> 
-#include <arpa/inet.h> 
-#include <netinet/in.h> 
+// Server side implementation of an UDP client-server model
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <string.h>
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <arpa/inet.h>
+#include <netinet/in.h>
 #include <netdb.h>
 
-#define PORT	 4242 
-#define MAXLINE 1024 
+#define PORT	 	4242
+#define GODOT_PORT	4000
+#define MAXLINE 	1024
+#define NB_MAX_JOUEURS 6
 
+// <<<<<<<<<<<<<<<<<<<<<<<<<<<< Les clients >>>>>>>>>>>>>>>>>>>>
+struct _client
+{
+        char ipAddress[40];
+        int port;
+        char name[40];
+} tcpClients[NB_MAX_JOUEURS];
+
+int nb_clients;
+
+void printClients()
+{
+        int i;
+
+        for (i=0;i<nb_clients;i++)
+                printf("%d: %s %5.5d %s\n",i,tcpClients[i].ipAddress,
+                        tcpClients[i].port,
+                        tcpClients[i].name);
+}
 
 void sendMessageToGodotClient(char *hostname,int portno, char *mess)
 {
@@ -32,7 +53,7 @@ void sendMessageToGodotClient(char *hostname,int portno, char *mess)
 
     	/* gethostbyname: get the server's DNS entry */
     	serverGodot = gethostbyname(hostname);
-    	if (serverGodot == NULL) 
+    	if (serverGodot == NULL)
 	{
         	fprintf(stderr,"ERROR, no such host as %s\n", hostname);
         	exit(1);
@@ -80,8 +101,8 @@ void sendMessageToGodotClient(char *hostname,int portno, char *mess)
 
     	/* send the message to the server */
     	serverlen = sizeof(serverGodotAddr);
-    	//n = sendto(socketGodot, sendBuffer, strlen(sendBuffer), 0, 
-    	n = sendto(socketGodot, mess, strlen(mess), 0, 
+    	//n = sendto(socketGodot, sendBuffer, strlen(sendBuffer), 0,
+    	n = sendto(socketGodot, mess, strlen(mess), 0,
 		(struct sockaddr *)&serverGodotAddr, serverlen);
     	if (n < 0)
 	{
@@ -91,51 +112,66 @@ void sendMessageToGodotClient(char *hostname,int portno, char *mess)
 	close(socketGodot);
 }
 
-int main() 
-{ 
-	int sockfd; 
-	char buffer[MAXLINE]; 
-	struct sockaddr_in servaddr, cliaddr; 
-	
-	// Creating socket file descriptor 
-	if ( (sockfd = socket(AF_INET, SOCK_DGRAM, 0)) < 0 ) { 
-		perror("socket creation failed"); 
-		exit(EXIT_FAILURE); 
-	} 
-	
-	memset(&servaddr, 0, sizeof(servaddr)); 
-	memset(&cliaddr, 0, sizeof(cliaddr)); 
-	
-	// Filling server information 
-	servaddr.sin_family = AF_INET; // IPv4 
-	servaddr.sin_addr.s_addr = INADDR_ANY; 
-	servaddr.sin_port = htons(PORT); 
-	
-	// Bind the socket with the server address 
-	if ( bind(sockfd, (const struct sockaddr *)&servaddr, 
-			sizeof(servaddr)) < 0 ) 
-	{ 
-		perror("bind failed"); 
-		exit(EXIT_FAILURE); 
-	} 
-	
-	int len, n; 
 
-	len = sizeof(cliaddr); //len is value/resuslt 
+int main()
+{
+	// Initialisation des clients
+	for (int i=0;i<NB_MAX_JOUEURS;i++)
+	{
+		strcpy(tcpClients[i].ipAddress,"temporaire");
+		tcpClients[i].port=-1;
+		strcpy(tcpClients[i].name,"-");
+	}
+
+;
+	int sockfd;
+	char buffer[MAXLINE];
+	struct sockaddr_in servaddr, cliaddr;
+
+	// Creating socket file descriptor
+	if ( (sockfd = socket(AF_INET, SOCK_DGRAM, 0)) < 0 ) {
+		perror("socket creation failed");
+		exit(EXIT_FAILURE);
+	}
+
+	memset(&servaddr, 0, sizeof(servaddr));
+	memset(&cliaddr, 0, sizeof(cliaddr));
+
+	// Filling server information
+	servaddr.sin_family = AF_INET; // IPv4
+	servaddr.sin_addr.s_addr = INADDR_ANY;
+	servaddr.sin_port = htons(PORT);
+
+	// Bind the socket with the server address
+	if ( bind(sockfd, (const struct sockaddr *)&servaddr,
+			sizeof(servaddr)) < 0 )
+	{
+		perror("bind failed");
+		exit(EXIT_FAILURE);
+	}
+
+	int len, n;
+
+	len = sizeof(cliaddr); //len is value/resuslt
 
 	while (1)
 	{
-		n = recvfrom(sockfd, (char *)buffer, MAXLINE, 
-				MSG_WAITALL, ( struct sockaddr *) &cliaddr, 
-				&len); 
+		n = recvfrom(sockfd, (char *)buffer, MAXLINE,
+				MSG_WAITALL, ( struct sockaddr *) &cliaddr,
+				&len);
+
 		//printf("n=%d\n",n);
-		buffer[n] = '\0'; 
-		
-		printf("Client : %s\n", buffer); 
+		buffer[n] = '\0';
 
-		sendMessageToGodotClient("172.19.0.1",4000,"Houla");
+		printf("Received packet from %s:%d\nData: [%s]\n\n",
+        	inet_ntoa(cliaddr.sin_addr), ntohs(cliaddr.sin_port),buffer);
+
+		char*reponse = "REPONSE";
+		printf("Envoyer %s au client %s:%d\n",reponse,
+        	inet_ntoa(cliaddr.sin_addr), ntohs(cliaddr.sin_port));
+
+		sendMessageToGodotClient(inet_ntoa(cliaddr.sin_addr),ntohs(cliaddr.sin_port),reponse);
 	}
-	
-	return 0; 
-} 
 
+	return 0;
+}
