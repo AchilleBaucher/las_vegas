@@ -33,6 +33,16 @@ void printClients()
                         tcpClients[i].port,
                         tcpClients[i].name);
 }
+void initialiser_clients()
+{
+	// Initialisation des clients
+	for (int i=0;i<NB_MAX_JOUEURS;i++)
+	{
+		strcpy(tcpClients[i].ipAddress,"temporaire");
+		tcpClients[i].port=-1;
+		strcpy(tcpClients[i].name,"-");
+	}
+}
 
 void sendMessageToGodotClient(char *hostname,int portno, char *mess)
 {
@@ -66,37 +76,7 @@ void sendMessageToGodotClient(char *hostname,int portno, char *mess)
           	(char *)&serverGodotAddr.sin_addr.s_addr, serverGodot->h_length);
     	serverGodotAddr.sin_port = htons(portno);
 
-/*
-0:13
-1:0
-2:0
-3:0
-4:1
-5:0
-6:0
-7:0
-8:4
-9:0
-10:0
-11:0
-12:6
-13:0
-14:0
-15:0
-*/
     	bzero((char *) sendBuffer, MAXLINE);
-/*
-	sendBuffer[0]=0x13;
-	sendBuffer[4]=1;
-	sendBuffer[8]=4;
-	sendBuffer[12]=6;
-	sprintf(sendBuffer+16,"%s\n",mess);
-
-	printf("about to send this %d\n",16+strlen(sendBuffer+16));
-	for (int i=0;i<16+strlen(sendBuffer+16+1);i++)
-		printf("%d:%x\n",i,sendBuffer[i]);
-*/
-
 	sprintf(sendBuffer,"ABCDEFGHIJKLMNOPQRSTUVWXYZ");
 
     	/* send the message to the server */
@@ -112,18 +92,23 @@ void sendMessageToGodotClient(char *hostname,int portno, char *mess)
 	close(socketGodot);
 }
 
+void repondre_connection(int id,char*reply)
+{
+	sprintf(reply,"TONID %d",id);
+}
 
+int statut_partie;
+void debuter_partie(){
+
+}
 int main()
 {
-	// Initialisation des clients
-	for (int i=0;i<NB_MAX_JOUEURS;i++)
-	{
-		strcpy(tcpClients[i].ipAddress,"temporaire");
-		tcpClients[i].port=-1;
-		strcpy(tcpClients[i].name,"-");
-	}
+	// Initialisation des valeurs
+	initialiser_clients();
+	statut_partie = 0; // 0:attente, 1: en cours, 2:fin
+	nb_clients = 0;
+	int id_joueur_en_cours = 0;
 
-;
 	int sockfd;
 	char buffer[MAXLINE];
 	struct sockaddr_in servaddr, cliaddr;
@@ -154,23 +139,66 @@ int main()
 
 	len = sizeof(cliaddr); //len is value/resuslt
 
+	char reply[256];
+	char* addresse_client;
+	int port_client;
+
+
 	while (1)
 	{
+		// <<<<<<<<<<<<<<< Réception >>>>>>>>>>>>>>
 		n = recvfrom(sockfd, (char *)buffer, MAXLINE,
 				MSG_WAITALL, ( struct sockaddr *) &cliaddr,
 				&len);
-
-		//printf("n=%d\n",n);
 		buffer[n] = '\0';
+		addresse_client = inet_ntoa(cliaddr.sin_addr);
+		port_client = ntohs(cliaddr.sin_port);
 
+		// Affichage facultatif
 		printf("Received packet from %s:%d\nData: [%s]\n\n",
-        	inet_ntoa(cliaddr.sin_addr), ntohs(cliaddr.sin_port),buffer);
+        	addresse_client,port_client ,buffer);
 
+		sprintf(reply,"REPONSE VIDE");
+		// <<<<<<<<<<<<<<< Traitement >>>>>>>>>>>>>>
+		if(statut_partie == 0)
+		{
+			switch(buffer[0])
+			{
+				case 'C' : // Connection d'un nouveau joueur
+					repondre_connection(nb_clients++,reply);
+					sendMessageToGodotClient(addresse_client,port_client,reply);
+					if(nb_clients > NB_MAX_JOUEURS)
+					{
+						statut_partie =1;
+						debuter_partie();
+					}
+			}
+		}
+
+		else if(statut_partie == 1)
+		{
+			switch(buffer[0])
+			{
+				case 'C' : ;// Connection à refuser
+					sendMessageToGodotClient(addresse_client,port_client,"Partie déjà en cours");
+				break;
+
+				case 'L': ;// Lancement des dés
+					int id_joueur, nombre_des;
+					sscanf(buffer,"L %d %d",&id_joueur,&nombre_des);
+					if(id_joueur!=id_joueur_en_cours)
+					{
+						sendMessageToGodotClient(addresse_client,port_client,"Ce n'est pas à toir de lancer");
+					}
+				break;
+			}
+		}
+		// <<<<<<<<<<<<<<< petite réponse de fin >>>>>>>>>>>>>>
 		char*reponse = "REPONSE";
-		printf("Envoyer %s au client %s:%d\n",reponse,
-        	inet_ntoa(cliaddr.sin_addr), ntohs(cliaddr.sin_port));
+		printf("Envoyer %s au client %s:%d\n",reply,
+        	addresse_client, port_client);
 
-		sendMessageToGodotClient(inet_ntoa(cliaddr.sin_addr),ntohs(cliaddr.sin_port),reponse);
+		sendMessageToGodotClient(addresse_client,port_client,reply);
 	}
 
 	return 0;
