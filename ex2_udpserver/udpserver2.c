@@ -33,6 +33,7 @@ void printClients()
                         tcpClients[i].port,
                         tcpClients[i].name);
 }
+
 void initialiser_clients()
 {
 	// Initialisation des clients
@@ -46,6 +47,9 @@ void initialiser_clients()
 
 void sendMessageToGodotClient(char *hostname,int portno, char *mess)
 {
+    printf("Envoyer le paquet : \n\"%s\"\n au client %s:%d\n",mess,
+        hostname, portno);
+
     	/* socket: create the socket */
 	int socketGodot;
 	struct hostent *serverGodot;
@@ -98,8 +102,23 @@ void repondre_connection(int id,char*reply)
 }
 
 int statut_partie;
-void debuter_partie(){
+void debuter_partie()
+{
 
+}
+void placer_des_casino(int id_j, int nb_d, int no_c)
+{
+
+}
+
+void tour_suivant()
+{
+
+}
+
+int get_nb_des(int id_j)
+{
+    return 0;
 }
 int main()
 {
@@ -158,45 +177,61 @@ int main()
 		printf("Received packet from %s:%d\nData: [%s]\n\n",
         	addresse_client,port_client ,buffer);
 
-		sprintf(reply,"REPONSE VIDE");
+		sprintf(reply,"W REPONSE VIDE");
 		// <<<<<<<<<<<<<<< Traitement >>>>>>>>>>>>>>
 		if(statut_partie == 0)
 		{
 			switch(buffer[0])
-			{
+            {
 				case 'C' : // Connection d'un nouveau joueur
 					repondre_connection(nb_clients++,reply);
-					sendMessageToGodotClient(addresse_client,port_client,reply);
-					if(nb_clients > NB_MAX_JOUEURS)
+					if(nb_clients >= NB_MAX_JOUEURS)
 					{
 						statut_partie =1;
 						debuter_partie();
 					}
-			}
-		}
+                    break;
+
+                default :
+                    sprintf(reply,"W Commande incomprise");
+                    break;
+            }
+        }
 
 		else if(statut_partie == 1)
 		{
 			switch(buffer[0])
 			{
 				case 'C' : ;// Connection à refuser
-					sendMessageToGodotClient(addresse_client,port_client,"Partie déjà en cours");
-				break;
+					sprintf(reply,"W Partie déjà en cours");
+	                break;
 
-				case 'L': ;// Lancement des dés
-					int id_joueur, nombre_des;
-					sscanf(buffer,"L %d %d",&id_joueur,&nombre_des);
-					if(id_joueur!=id_joueur_en_cours)
-					{
-						sendMessageToGodotClient(addresse_client,port_client,"Ce n'est pas à toir de lancer");
-					}
-				break;
+				case 'P': ; // Placement des dés
+                    // Le joueur id place nb_d dés sur le casino no_c
+					int id_j, nb_d, no_c;
+					sscanf(buffer,"P %d %d %d",&id_j,&nb_d,&no_c);
+
+                    // Cas d'erreur :
+					if(id_j!=id_joueur_en_cours)
+						sprintf(reply,"W Ce n'est pas à toi (%d) de lancer mais à %d",id_j, id_joueur_en_cours);
+                    else if(nb_d > get_nb_des(id_j) | nb_d < 1)
+						sprintf(reply,"W Nombre de dés (%d) incorrect",nb_d);
+                    else if(no_c < 1 | no_c > 6)
+						sprintf(reply,"W Numéro de casino (%d) incorrect",no_c);
+
+                    // Cas de non erreur
+                    else
+                    {
+                        placer_des_casino(id_j,nb_d,no_c);
+                        tour_suivant();
+                    }
+				    break;
+
+                default :
+                    sprintf(reply,"W Commande incomprise");
 			}
 		}
 		// <<<<<<<<<<<<<<< petite réponse de fin >>>>>>>>>>>>>>
-		char*reponse = "REPONSE";
-		printf("Envoyer %s au client %s:%d\n",reply,
-        	addresse_client, port_client);
 
 		sendMessageToGodotClient(addresse_client,port_client,reply);
 	}
