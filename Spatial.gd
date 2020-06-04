@@ -32,6 +32,14 @@ var repartition = [null,null,null,null,null,null]
 # Les noeuds des casinos 
 var casinoNode = [null,null,null,null,null,null]
 
+var billets_casinos = [
+	[],
+	[],
+	[],
+	[],
+	[],
+	[]]
+
 # Le noeud des dés
 var deNode = null
 # Quantité totale d'argent du joueur
@@ -44,10 +52,12 @@ func _ready():
 	
 	# Créer dynamiquement les noeuds des casios en fils de ce noeud là (C5)
 	for i in range(6):
-		var posz = i*5-10
-		casinoNode[0] = createCasino(5,0,posz,i+1,casinoImages[i])
-		var billet1 = createBillet(3,0,posz,1,billetImages[0])
-		var billet2 = createBillet(3,0,posz+1,1,billetImages[2])
+		var posz = poscasinos(i)
+		casinoNode[0] = createCasino(0,0,posz,i+1,casinoImages[i])
+#		add_billet_cas(i,3)
+#		add_billet_cas(i,5)
+#		add_billet_cas(i,8)
+#		add_billet_cas(i,2)
 #	deNode = createDes(imageDe)
 	var argentTotal = 0
 
@@ -77,7 +87,7 @@ func createCasino(posx,posy,posz,numero,imgName):
 	SpatialNode.add_child(mi)
 	return mi
 
-func createBillet(posx,posy,posz,nombre,imgName):
+func createBillet(posx,posy,posz,nombre):
 	#Créer un pointeur vers la nouvelle instance qu'on vient veut créer 
 	var mi = myMeshRessource.new()
 	
@@ -94,13 +104,24 @@ func createBillet(posx,posy,posz,nombre,imgName):
 	
 	# Associer la texture 
 	var texture = ImageTexture.new()
-	texture.load(imgName)
+	texture.load(billetImages[nombre])
 	surface_material.albedo_texture = texture
 	
 	# Ajouter le casino en tant que child
 	SpatialNode.add_child(mi)
 	return mi
+
+func poscasinos(num):
+	return 10*num-30	
 	
+func add_billet_cas(num, billet):
+	var posx = 3
+	var posy = 0
+	var posz = poscasinos(num)+billets_casinos[num].size()*2
+	billets_casinos[num].append(createBillet(posx,posy,posz,billet))
+	billets_casinos[num][billets_casinos[num].size()-1].set_rotation(Vector3(0,PI/2,0))
+	
+
 func createDes(couleur):
 	#Créer un pointeur vers la nouvelle instance qu'on vient veut créer 
 	var mi = myMeshRessource.new()

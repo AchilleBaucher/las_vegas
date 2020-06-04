@@ -8,6 +8,8 @@
 [node name="ControlGame" type="Control"]
 anchor_right = 1.0
 anchor_bottom = 1.0
+margin_top = 4.0
+margin_bottom = 4.0
 script = ExtResource( 1 )
 __meta__ = {
 "_edit_use_anchors_": false
@@ -17,7 +19,7 @@ __meta__ = {
 script = ExtResource( 3 )
 
 [node name="Camera" type="Camera" parent="Spatial"]
-transform = Transform( -1.0554e-07, -0.76181, 0.647801, -1.24115e-07, 0.647801, 0.76181, -1, 7.10543e-15, -1.62921e-07, 10, 10, 0 )
+transform = Transform( 2.01377e-08, -0.992332, -0.123602, -1.61672e-07, -0.123602, 0.992332, -1, -3.85469e-13, -1.62921e-07, 9.99092, 10, 0 )
 script = ExtResource( 2 )
 
 [node name="Board" type="MeshInstance" parent="Spatial"]
@@ -39,5 +41,21 @@ margin_bottom = 20.0
 text = "Menu principal"
 __meta__ = {
 "_edit_use_anchors_": false
+}
+
+[node name="ButtonTest" type="Button" parent="."]
+anchor_left = 0.484
+anchor_top = 0.141
+anchor_right = 0.484
+anchor_bottom = 0.141
+margin_left = -37.0
+margin_top = 83.4
+margin_right = 436.0
+margin_bottom = 103.4
+action_mode = 0
+text = "test"
+__meta__ = {
+"_edit_use_anchors_": false,
+"_editor_description_": ""
 }
 [connection signal="pressed" from="ButtonMenu" to="." method="_on_ButtonMenu_pressed"]

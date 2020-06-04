@@ -1,8 +1,9 @@
 extends Control
 
+var SpatialNode
 
 func _ready():
-	pass # Replace with function body.
+	SpatialNode = get_tree().get_root().get_node("ControlGame").get_node("Spatial")
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 #func _process(delta):
@@ -11,8 +12,9 @@ func _ready():
 func _networkMessage(mess):
 	print ("_networkMessage=",mess)
 	match mess[0]:
-		'C':
-			pass
+		'B': # Les billets associés à un casino
+			# Attention aux indices
+			SpatialNode.add_billet_cas(mess[1],mess[2])
 		'T':
 			pass
 		'D':
@@ -28,6 +30,7 @@ func _on_ButtonMenu_pressed():
 	print (root,myself)
 	root.remove_child(myself)
 	root.add_child(global.controlMenuNode)
+
 	
 func createTile(x,y,tilenum):
 	# Create a new tile instance
