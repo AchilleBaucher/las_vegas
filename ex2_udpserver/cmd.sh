@@ -2,4 +2,4 @@
 #gcc -o udpserver udpserver.c
 gcc -o udpserver2 udpserver2.c
 gcc -o udpclient udpclient.c
-gcc -o testip testip.c
+# gcc -o testip testip.c
