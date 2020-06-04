@@ -5,9 +5,26 @@ var myMeshRessource
 var SpatialNode
 
 # Images
-var billetImages = ["res://images/billets/50.jpg"]
-var casinoImages = ["res://images/casinos/1.jpg"]
-var imageDe = "res://images/des/de"
+var billetImages = [
+	"res://images/billets/10.jpg",
+	"res://images/billets/20.jpg",
+	"res://images/billets/30.jpg",
+	"res://images/billets/40.jpg",
+	"res://images/billets/50.jpg",
+	"res://images/billets/60.jpg",
+	"res://images/billets/70.jpg",
+	"res://images/billets/80.jpg",
+	"res://images/billets/90.jpg"]
+
+var casinoImages = [
+	"res://images/casinos/1.jpg",
+	"res://images/casinos/2.jpg",
+	"res://images/casinos/3.jpg",
+	"res://images/casinos/4.jpg",
+	"res://images/casinos/5.jpg",
+	"res://images/casinos/6.jpg"]
+	
+var imageDe = "res://images/des/1W"
 
 # Répartition des dés des joueurs
 var repartition = [null,null,null,null,null,null]
@@ -26,12 +43,11 @@ func _ready():
 	myMeshRessource = load("res://MyMesh.gd")
 	
 	# Créer dynamiquement les noeuds des casios en fils de ce noeud là (C5)
-	casinoNode[0] = createCasino(5,5,5,1,casinoImages[0])
-	var billet1 = createBillet(4,4,4,1,billetImages[0])
-	
-	casinoNode[0] = createCasino(5,10,5,2,casinoImages[0])
-	casinoNode[0] = createCasino(3,2,1,3,casinoImages[0])
-	casinoNode[0] = createCasino(4,5,8,4,casinoImages[0])
+	for i in range(6):
+		var posz = i*5-10
+		casinoNode[0] = createCasino(5,0,posz,i+1,casinoImages[i])
+		var billet1 = createBillet(3,0,posz,1,billetImages[0])
+		var billet2 = createBillet(3,0,posz+1,1,billetImages[2])
 #	deNode = createDes(imageDe)
 	var argentTotal = 0
 
