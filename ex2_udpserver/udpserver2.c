@@ -114,7 +114,7 @@ void repondre_connection(int id,char*reply)
 int statut_partie;
 
 
-void debuter_partie()
+void distribuer_billets()
 {
 	int total ;
 	for (int i = 0; i<6; i++)
@@ -151,9 +151,12 @@ void placer_des_casino(int id_j, int nb_d, int no_c)
 
 }
 
-void tour_suivant()
+// Demande de lancer les dés
+void tour_suivant(int idj)
 {
-
+    char reply[MAXLINE];
+    sprintf(reply,"T%d",tcpClients[idj].nb_des);
+    sendMessageToGodotClient(tcpClients[idj].ipAddress,tcpClients[idj].port,reply);
 }
 
 int get_nb_des(int id_j)
@@ -242,8 +245,8 @@ int main()
 					if(nb_clients >= NB_MAX_JOUEURS)
 					{
 						statut_partie =1;
-						debuter_partie();
-					}
+						distribuer_billets();
+                        tour_suivant(0);					}
 
                     break;
 
@@ -289,7 +292,7 @@ int main()
     						sendMessageToGodotClient(tcpClients[i].ipAddress,tcpClients[i].port,des_ajoutes);
     					}
 
-                        tour_suivant();
+                        tour_suivant(++id_joueur_en_cours);
                     }
 				    break;
 
