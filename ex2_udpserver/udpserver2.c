@@ -29,6 +29,7 @@ struct _casino
 {
 		int billets[5];
 		int nb_billets;
+        int rep_des[NB_MAX_JOUEURS];
 } casinos[6];
 
 void printClients()
@@ -141,7 +142,7 @@ void debuter_partie()
 }
 void placer_des_casino(int id_j, int nb_d, int no_c)
 {
-
+    casinos[id_c].rep_des[id_j] = nb_d;
 }
 
 void tour_suivant()
@@ -221,13 +222,16 @@ int main()
 					sprintf(tcpClients[nb_clients].ipAddress,addresse_client);
 					tcpClients[nb_clients].port=port_client;
 					repondre_connection(nb_clients++,reply);
-					char ilreste[MAXLINE];
+
+                    // Indiquer à chacun combien il reste de joueurs pour commencer
+                    char ilreste[MAXLINE];
 					sprintf(ilreste,"Z%d",6-nb_clients);
 					for(int i=0; i<nb_clients; i++)
 					{
 						sendMessageToGodotClient(tcpClients[i].ipAddress,tcpClients[i].port,ilreste);
 					}
 
+                    // Si le nombre est atteint, on commence
 					if(nb_clients >= NB_MAX_JOUEURS)
 					{
 						statut_partie =1;
@@ -269,6 +273,15 @@ int main()
                     else
                     {
                         placer_des_casino(id_j,nb_d,no_c);
+
+                        // Préviens tout le monde des dés ajoutés
+                        char des_ajoutes[MAXLINE]
+                        sprintf(des_ajoutes,"D%d%d%d",id_j,nb_d,no_c);
+                        for(int i=0; i<nb_clients; i++)
+    					{
+    						sendMessageToGodotClient(tcpClients[i].ipAddress,tcpClients[i].port,des_ajoutes);
+    					}
+
                         tour_suivant();
                     }
 				    break;

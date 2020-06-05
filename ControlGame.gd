@@ -12,8 +12,7 @@ func _ready():
 func _networkMessage(mess):
 	print ("_networkMessage=",mess)
 	match mess[0]:
-		'B': # Les billets associés à un casino
-			# Attention aux indices
+		'B': # Ajouter un billet à un casino
 			SpatialNode.add_billet_cas(int(mess[1]),int(mess[2]))
 		'T':
 			pass
