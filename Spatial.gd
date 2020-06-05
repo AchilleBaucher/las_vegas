@@ -53,17 +53,13 @@ func _ready():
 	# Créer dynamiquement les noeuds des casios en fils de ce noeud là (C5)
 	for i in range(6):
 		var posz = poscasinos(i)
-		casinoNode[0] = createCasino(0,0,posz,i+1,casinoImages[i])
-#		add_billet_cas(i,3)
-#		add_billet_cas(i,5)
-#		add_billet_cas(i,8)
-#		add_billet_cas(i,2)
+		casinoNode[i] = createCasino(0,0,posz,casinoImages[i])
 #	deNode = createDes(imageDe)
 	var argentTotal = 0
 
 # Fonction créant une nouvelle instance casino
 # Positions de la carte, image du casino, numéro du casino
-func createCasino(posx,posy,posz,numero,imgName):
+func createCasino(posx,posy,posz,imgName):
 	#Créer un pointeur vers la nouvelle instance qu'on vient veut créer 
 	var mi = myMeshRessource.new()
 	
@@ -115,6 +111,7 @@ func poscasinos(num):
 	return 10*num-30	
 	
 func add_billet_cas(num, billet):
+	print("ajouter le billet "+String(billet)+" au casino "+String(num))
 	var posx = 3
 	var posy = 0
 	var posz = poscasinos(num)+billets_casinos[num].size()*2

@@ -115,30 +115,29 @@ int statut_partie;
 void debuter_partie()
 {
 	int total ;
-	for (int i = 1; i<6; i++)
+	for (int i = 0; i<6; i++)
 	{
 		total = 0;
-		for (int j=0;j<5 && total <5;j++) 
+		for (int j=0;j<5 && total <5;j++)
 		{
 			casinos[i].billets[j]+=rand()%9+1;
 			total+=casinos[i].billets[j];
-			casinos[i].nb_billets+=1; 
+			casinos[i].nb_billets+=1;
 		}
 	}
 	char reply[MAXLINE];
-	for(int i = 0; i<NB_MAX_JOUEURS; i++)
+	for(int i = 0; i<1/*NB_MAX_JOUEURS*/; i++)
 	{
 		for(int j=0; j<6;j++)
 		{
 			for(int k=0; k<casinos[j].nb_billets;k++)
 			{
-				printf("caca\n");
-				sprintf(reply,"B%d%d",j,casinos[j].billets[k]);
+				sprintf(reply,"B%d%d",j,casinos[j].billets[k]-1);
 				sendMessageToGodotClient(tcpClients[i].ipAddress,tcpClients[i].port, reply);
 			}
 		}
-	} 
-	
+	}
+
 }
 void placer_des_casino(int id_j, int nb_d, int no_c)
 {
