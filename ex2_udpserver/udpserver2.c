@@ -8,6 +8,7 @@
 #include <arpa/inet.h>
 #include <netinet/in.h>
 #include <netdb.h>
+#include <time.h>
 
 #define PORT	 	4242
 #define GODOT_PORT	4000
@@ -23,6 +24,12 @@ struct _client
 } tcpClients[NB_MAX_JOUEURS];
 
 int nb_clients;
+
+struct _casino
+{
+		int billets[5];
+		int nb_billets;
+} casinos[6];
 
 void printClients()
 {
@@ -99,12 +106,39 @@ void sendMessageToGodotClient(char *hostname,int portno, char *mess)
 void repondre_connection(int id,char*reply)
 {
 	sprintf(reply,"TONID %d",id);
+
 }
 
 int statut_partie;
+
+
 void debuter_partie()
 {
-
+	int total ;
+	for (int i = 1; i<6; i++)
+	{
+		total = 0;
+		for (int j=0;j<5 && total <5;j++) 
+		{
+			casinos[i].billets[j]+=rand()%9+1;
+			total+=casinos[i].billets[j];
+			casinos[i].nb_billets+=1; 
+		}
+	}
+	char reply[MAXLINE];
+	for(int i = 0; i<NB_MAX_JOUEURS; i++)
+	{
+		for(int j=0; j<6;j++)
+		{
+			for(int k=0; k<casinos[j].nb_billets;k++)
+			{
+				printf("caca\n");
+				sprintf(reply,"B%d%d",j,casinos[j].billets[k]);
+				sendMessageToGodotClient(tcpClients[i].ipAddress,tcpClients[i].port, reply);
+			}
+		}
+	} 
+	
 }
 void placer_des_casino(int id_j, int nb_d, int no_c)
 {
@@ -122,8 +156,9 @@ int get_nb_des(int id_j)
 }
 int main()
 {
+
+	srand(time(NULL));
 	// Initialisation des valeurs
-	initialiser_clients();
 	statut_partie = 0; // 0:attente, 1: en cours, 2:fin
 	nb_clients = 0;
 	int id_joueur_en_cours = 0;
@@ -184,17 +219,29 @@ int main()
 			switch(buffer[0])
             {
 				case 'C' : // Connection d'un nouveau joueur
+					sprintf(tcpClients[nb_clients].ipAddress,addresse_client);
+					tcpClients[nb_clients].port=port_client;
 					repondre_connection(nb_clients++,reply);
+					char ilreste[MAXLINE];
+					sprintf(ilreste,"Z%d",6-nb_clients);
+					for(int i=0; i<nb_clients; i++)
+					{
+						sendMessageToGodotClient(tcpClients[i].ipAddress,tcpClients[i].port,ilreste);
+					}
+
 					if(nb_clients >= NB_MAX_JOUEURS)
 					{
 						statut_partie =1;
 						debuter_partie();
 					}
+
                     break;
+
 
                 default :
                     sprintf(reply,"W Commande incomprise");
                     break;
+
             }
         }
 
