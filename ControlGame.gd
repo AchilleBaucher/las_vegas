@@ -14,8 +14,10 @@ func _networkMessage(mess):
 	match mess[0]:
 		'B': # Ajouter un billet à un casino
 			SpatialNode.add_billet_cas(int(mess[1]),int(mess[2]))
-		'T':
-			pass
+			
+		'T': # A mon tour, je lance les dés
+			lancer_des(int(mess[1]),int(mess[2]))
+			
 		'D': #Ajouter des dés à un casino
 			SpatialNode.add_des_cas(int(mess[1]),int(mess[2]),int(mess[3]))
 			
@@ -32,7 +34,16 @@ func _on_ButtonMenu_pressed():
 	root.remove_child(myself)
 	root.add_child(global.controlMenuNode)
 
+func lancer_des(idj,nb_d):
+	# Tirer les dés
+	var des = [0,0,0,0,0,0]
+	for i in range(nb_d):
+		des[randi()%6] += 1
 	
+	# Pour l'instant envoyer au pif, changer bientot !#
+	print ("sending UDP test data to "+global.ipAddress+" port 4242")
+	global.controlMenuNode.socket.put_packet(("P %d %d %d"%[idj,1,des[0]]).to_ascii())
+
 func createTile(x,y,tilenum):
 	# Create a new tile instance
 	var mi=MeshInstance.new()

@@ -33,14 +33,13 @@ var desImages = [
 	["res://images/des/1R.jpg","res://images/des/2R.jpg","res://images/des/3R.jpg","res://images/des/4R.jpg","res://images/des/5R.jpg","res://images/des/6R.jpg"]
 ]
 
-var imageDe = "res://images/des/1W"
-
 # Répartition des dés des joueurs
 var repartition = [null,null,null,null,null,null]
 
 # Les noeuds des casinos 
 var casinoNode = [null,null,null,null,null,null]
 
+# Les billets de chaque casino
 var billets_casinos = [
 	[],
 	[],
@@ -49,6 +48,7 @@ var billets_casinos = [
 	[],
 	[]]
 
+# Les dés de chaque casino
 var des_casinos = [
 	[],
 	[],
@@ -58,25 +58,20 @@ var des_casinos = [
 	[],
 ]
 
-# Le noeud des dés
-var deNode = null
-# Quantité totale d'argent du joueur
-
 func _ready():
 	# Le noeud vers spatial (C6)
 	SpatialNode = get_tree().get_root().get_node("ControlGame").get_node("Spatial")
 	# Pointeur vers l'instance future de la classe MyMesh (C6)
 	myMeshRessource = load("res://MyMesh.gd")
 	
-	# Créer dynamiquement les noeuds des casios en fils de ce noeud là (C5)
+	# Créer dynamiquement les noeuds des casinos en fils de ce noeud là (C5)
 	for i in range(6):
 		var posz = poscasinos(i)
 		casinoNode[i] = createCasino(0,0,posz,casinoImages[i])
-#	deNode = createDes(imageDe)
-	var argentTotal = 0
 
-# Fonction créant une nouvelle instance casino
-# Positions de la carte, image du casino, numéro du casino
+# <<<<<<<<<<<<<<<<<<<<<<<<<<<<< CRÉATION DE NOEUDS >>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+# Créer un casino d'image imgName à la position indiquée
 func createCasino(posx,posy,posz,imgName):
 	#Créer un pointeur vers la nouvelle instance qu'on vient veut créer 
 	var mi = myMeshRessource.new()
@@ -101,6 +96,7 @@ func createCasino(posx,posy,posz,imgName):
 	SpatialNode.add_child(mi)
 	return mi
 
+# Créer un billet de valeur nombre (1->9) à la position indiquée
 func createBillet(posx,posy,posz,nombre):
 	#Créer un pointeur vers la nouvelle instance qu'on vient veut créer 
 	var mi = myMeshRessource.new()
@@ -125,26 +121,6 @@ func createBillet(posx,posy,posz,nombre):
 	SpatialNode.add_child(mi)
 	return mi
 
-func poscasinos(num):
-	return 10*num-30	
-	
-func add_billet_cas(num, billet):
-	print("ajouter le billet "+String(billet)+" au casino "+String(num))
-	var posx = 3
-	var posy = 0
-	var posz = poscasinos(num)+billets_casinos[num].size()*2
-	billets_casinos[num].append(createBillet(posx,posy,posz,billet))
-	billets_casinos[num][billets_casinos[num].size()-1].set_rotation(Vector3(0,PI/2,0))
-	
-
-func add_des_cas(joueur, des, casino):
-	for d in range(des):
-		print("Ajouter %d dés au casino %d pour le joueur %d"%[des,casino,joueur])
-		var posx = -3-des_casinos[casino].size()*8
-		var posy = 0
-		var posz = poscasinos(casino)
-		des_casinos[casino].append(createDe(posx,posy,posz,joueur,casino))
-		
 func createDe(posx,posy,posz,couleur,nombre):
 	#Créer un pointeur vers la nouvelle instance qu'on vient veut créer 
 	var mi = myMeshRessource.new()
@@ -168,6 +144,32 @@ func createDe(posx,posy,posz,couleur,nombre):
 	# Ajouter le dé en tant que child
 	SpatialNode.add_child(mi)
 	return mi
+	
+# <<<<<<<<<<<<<<<<<<<<<<<<<<<<< AUTRES FONCTIONS >>>>>>>>>>>>>>>>>>>>>>>>>>>>
+# Position par défaut d'un casino en fonction de son numéro
+func poscasinos(num):
+	return 10*num-30	
+
+# Ajouter un billet billet au casino num
+func add_billet_cas(num, billet):
+	print("ajouter le billet "+String(billet)+" au casino "+String(num))
+	var posx = 3
+	var posy = 0
+	var posz = poscasinos(num)+billets_casinos[num].size()*2
+	billets_casinos[num].append(createBillet(posx,posy,posz,billet))
+	billets_casinos[num][billets_casinos[num].size()-1].set_rotation(Vector3(0,PI/2,0))
+	
+
+# Ajouter un nombre de dés des d'un joueur joueur au casino casino
+func add_des_cas(joueur, des, casino):
+	for d in range(des):
+		print("Ajouter %d dés au casino %d pour le joueur %d"%[des,casino,joueur])
+		var posx = -3-des_casinos[casino].size()*8
+		var posy = 0
+		var posz = poscasinos(casino)
+		des_casinos[casino].append(createDe(posx,posy,posz,joueur,casino))
+		
+
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 #func _process(delta):
 #	pass

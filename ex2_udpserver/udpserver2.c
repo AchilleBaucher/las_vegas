@@ -14,35 +14,46 @@
 #define GODOT_PORT	4000
 #define MAXLINE 	1024
 #define NB_MAX_JOUEURS 6
+#define NB_CASINOS 6
 
-// <<<<<<<<<<<<<<<<<<<<<<<<<<<< Les clients >>>>>>>>>>>>>>>>>>>>
+// <<<<<<<<<<<<<<<<<<<<<<<<<<<< Initialisation >>>>>>>>>>>>>>>>>>>>
+
+// Structure client, stocke des infos sur un client godot
 struct _client
 {
-        char ipAddress[40];
-        int port;
-        char name[40];
-        int nb_des;
+    char ipAddress[40];
+    int port;
+    char name[40];
+    int nb_des;
 } tcpClients[NB_MAX_JOUEURS];
 
+// Nombre de joueurs participants
 int nb_clients;
 
+// Un casino, contient ses billets et ses dés
 struct _casino
 {
-		int billets[5];
-		int nb_billets;
-        int rep_des[NB_MAX_JOUEURS];
-} casinos[6];
+    // Il y a maximum 5 billets, sa vraie valeur est x10 000 (3 = 30 000)
+	int billets[5];
+	int nb_billets;
 
+    // Pour chaque joueur, le nombre de dés qu'il a sur ce casino
+    int rep_des[NB_MAX_JOUEURS];
+} casinos[NB_CASINOS];
+
+// Affiche tous les clients
 void printClients()
 {
-        int i;
+    int i;
 
-        for (i=0;i<nb_clients;i++)
-                printf("%d: %s %5.5d %s\n",i,tcpClients[i].ipAddress,
-                        tcpClients[i].port,
-                        tcpClients[i].name);
+    for (i=0;i<nb_clients;i++)
+            printf("%d: %s %5.5d %s\n",i,
+                tcpClients[i].ipAddress,
+                tcpClients[i].port,
+                tcpClients[i].name);
 }
 
+// Initialisation de tous les clients à des trucs
 void initialiser_clients()
 {
 	// Initialisation des clients
@@ -54,6 +65,7 @@ void initialiser_clients()
 	}
 }
 
+// Envoie un message à un client godot
 void sendMessageToGodotClient(char *hostname,int portno, char *mess)
 {
     printf("Envoyer le paquet : \n\"%s\"\n au client %s:%d\n",mess,
@@ -105,73 +117,85 @@ void sendMessageToGodotClient(char *hostname,int portno, char *mess)
 	close(socketGodot);
 }
 
-void repondre_connection(int id,char*reply)
-{
-	sprintf(reply,"TONID %d",id);
-
-}
-
-int statut_partie;
-
-
+// Distribue aléatoirement des billets sur chaque casino en début de partie
 void distribuer_billets()
 {
+    // Quantité d'argent sur un casino
 	int total ;
-	for (int i = 0; i<6; i++)
+
+    // Pour chaque casino
+	for (int i = 0; i<NB_CASINOS; i++)
 	{
 		total = 0;
+        // Tant qu'on es pas à plus de 50 000
 		for (int j=0;j<5 && total <5;j++)
 		{
+            // On met un nouveau billet aléatoirement
 			casinos[i].billets[j]+=rand()%9+1;
 			total+=casinos[i].billets[j];
 			casinos[i].nb_billets+=1;
 		}
 	}
+
+    // Ceci fait, on envoie à tous les clients du jeu les nouveaux billets
+    // !# Attention, et si moins de joueurs que NB_MAX_JOUEURS ?
+
+    // La réponse
 	char reply[MAXLINE];
-	for(int i = 0; i<1/*NB_MAX_JOUEURS*/; i++)
+
+    // Pour chaque joueur
+	for(int i = 0; i<NB_MAX_JOUEURS; i++)
 	{
-		for(int j=0; j<6;j++)
+        // Pour chaque casino
+		for(int j=0; j<NB_CASINOS;j++)
 		{
 			for(int k=0; k<casinos[j].nb_billets;k++)
+            // Pour chaque billet
 			{
+                // Envoyer le message du billet
 				sprintf(reply,"B%d%d",j,casinos[j].billets[k]-1);
 				sendMessageToGodotClient(tcpClients[i].ipAddress,tcpClients[i].port, reply);
 			}
 		}
 	}
-
 }
+
+// Place les nb_d dés du joueur id_j sur le casino no_c
 void placer_des_casino(int id_j, int nb_d, int no_c)
 {
     if(tcpClients[id_j].nb_des -nb_d >= 0)
     {
+        // Enlever le nombre de dés au joueur et ajouter ses dés sur le casino
         tcpClients[id_j].nb_des = tcpClients[id_j].nb_des - nb_d;
         casinos[no_c].rep_des[id_j] = nb_d;
     }
 
 }
 
-// Demande de lancer les dés
+// Demande de à idj de lancer les dés
 void tour_suivant(int idj)
 {
     char reply[MAXLINE];
-    sprintf(reply,"T%d",tcpClients[idj].nb_des);
+    sprintf(reply,"T%d%d",idj,tcpClients[idj].nb_des);
     sendMessageToGodotClient(tcpClients[idj].ipAddress,tcpClients[idj].port,reply);
 }
 
-int get_nb_des(int id_j)
-{
-    return 0;
-}
+
+// 0:attente, 1: en cours, 2:fin
+int statut_partie;
+
 int main()
 {
 
-	srand(time(NULL));
+    // <<<<<<<<<<<<<<< Initialisation >>>>>>>>>>>>>>
+
 	// Initialisation des valeurs
-	statut_partie = 0; // 0:attente, 1: en cours, 2:fin
+	statut_partie = 0;
 	nb_clients = 0;
 	int id_joueur_en_cours = 0;
+    srand(time(NULL));
 
+    // Scket
 	int sockfd;
 	char buffer[MAXLINE];
 	struct sockaddr_in servaddr, cliaddr;
@@ -206,7 +230,7 @@ int main()
 	char* addresse_client;
 	int port_client;
 
-
+    // <<<<<<<<<<<<<<< Boucle >>>>>>>>>>>>>>
 	while (1)
 	{
 		// <<<<<<<<<<<<<<< Réception >>>>>>>>>>>>>>
@@ -221,8 +245,12 @@ int main()
 		printf("Received packet from %s:%d\nData: [%s]\n\n",
         	addresse_client,port_client ,buffer);
 
+        // Par défaut la réponse est comme ça
 		sprintf(reply,"W REPONSE VIDE");
+
 		// <<<<<<<<<<<<<<< Traitement >>>>>>>>>>>>>>
+
+        // La partie n'a pas commencé
 		if(statut_partie == 0)
 		{
 			switch(buffer[0])
@@ -235,7 +263,7 @@ int main()
 
                     // Indiquer à chacun combien il reste de joueurs pour commencer
                     char ilreste[MAXLINE];
-					sprintf(ilreste,"Z%d",6-nb_clients);
+					sprintf(ilreste,"Z%d",NB_MAX_JOUEURS-nb_clients);
 					for(int i=0; i<nb_clients; i++)
 					{
 						sendMessageToGodotClient(tcpClients[i].ipAddress,tcpClients[i].port,ilreste);
@@ -258,15 +286,18 @@ int main()
             }
         }
 
+        // La partie a déjà commencé
 		else if(statut_partie == 1)
 		{
 			switch(buffer[0])
 			{
 				case 'C' : ;// Connection à refuser
+                
 					sprintf(reply,"W Partie déjà en cours");
 	                break;
 
-				case 'P': ; // Placement des dés
+				case 'P': ; // Placement des dés d'un joueur sur un casino
+
                     // Le joueur id place nb_d dés sur le casino no_c
 					int id_j, nb_d, no_c;
 					sscanf(buffer,"P %d %d %d",&id_j,&nb_d,&no_c);
@@ -274,9 +305,9 @@ int main()
                     // Cas d'erreur :
 					if(id_j!=id_joueur_en_cours)
 						sprintf(reply,"W Ce n'est pas à toi (%d) de lancer mais à %d",id_j, id_joueur_en_cours);
-                    else if(nb_d > get_nb_des(id_j) | nb_d < 1)
+                    else if(nb_d > tcpClients[id_j].nb_des | nb_d < 1)
 						sprintf(reply,"W Nombre de dés (%d) incorrect",nb_d);
-                    else if(no_c < 1 | no_c > 6)
+                    else if(no_c < 1 | no_c > NB_CASINOS)
 						sprintf(reply,"W Numéro de casino (%d) incorrect",no_c);
 
                     // Cas de non erreur
