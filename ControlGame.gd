@@ -16,7 +16,9 @@ func _networkMessage(mess):
 			SpatialNode.add_billet_cas(int(mess[1]),int(mess[2]))
 		'T':
 			pass
-		'D':
+		'D': #Ajouter des dés à un casino
+			SpatialNode.add_des_cas(int(mess[1]),int(mess[2]),int(mess[3]))
+			
 			pass
 		'L':
 			pass

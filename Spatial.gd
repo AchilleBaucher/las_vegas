@@ -24,6 +24,15 @@ var casinoImages = [
 	"res://images/casinos/5.jpg",
 	"res://images/casinos/6.jpg"]
 	
+var desImages = [
+	["res://images/des/1W.jpg","res://images/des/2W.jpg","res://images/des/3W.jpg","res://images/des/4W.jpg","res://images/des/5W.jpg","res://images/des/6W.jpg"],
+	["res://images/des/1B.jpg","res://images/des/2B.jpg","res://images/des/3B.jpg","res://images/des/4B.jpg","res://images/des/5B.jpg","res://images/des/6B.jpg"],
+	["res://images/des/1G.jpg","res://images/des/2G.jpg","res://images/des/3G.jpg","res://images/des/4G.jpg","res://images/des/5G.jpg","res://images/des/6G.jpg"],
+	["res://images/des/1N.jpg","res://images/des/2N.jpg","res://images/des/3N.jpg","res://images/des/4N.jpg","res://images/des/5N.jpg","res://images/des/6N.jpg"],
+	["res://images/des/1Y.jpg","res://images/des/2Y.jpg","res://images/des/3Y.jpg","res://images/des/4Y.jpg","res://images/des/5Y.jpg","res://images/des/6Y.jpg"],
+	["res://images/des/1R.jpg","res://images/des/2R.jpg","res://images/des/3R.jpg","res://images/des/4R.jpg","res://images/des/5R.jpg","res://images/des/6R.jpg"]
+]
+
 var imageDe = "res://images/des/1W"
 
 # Répartition des dés des joueurs
@@ -39,6 +48,15 @@ var billets_casinos = [
 	[],
 	[],
 	[]]
+
+var des_casinos = [
+	[],
+	[],
+	[],
+	[],
+	[],
+	[],
+]
 
 # Le noeud des dés
 var deNode = null
@@ -119,15 +137,23 @@ func add_billet_cas(num, billet):
 	billets_casinos[num][billets_casinos[num].size()-1].set_rotation(Vector3(0,PI/2,0))
 	
 
-func createDes(couleur):
+func add_des_cas(joueur, des, casino):
+	for d in range(des):
+		print("Ajouter %d dés au casino %d pour le joueur %d"%[des,casino,joueur])
+		var posx = -3-des_casinos[casino].size()*8
+		var posy = 0
+		var posz = poscasinos(casino)
+		des_casinos[casino].append(createDe(posx,posy,posz,joueur,casino))
+		
+func createDe(posx,posy,posz,couleur,nombre):
 	#Créer un pointeur vers la nouvelle instance qu'on vient veut créer 
 	var mi = myMeshRessource.new()
 	
 	# Positioner le dé au bon endroit
-	mi.set_translation(Vector3(0,0,0))
+	mi.set_translation(Vector3(posx,posy,posz))
 	
 	# Récupérer le maillage de l'objet
-	var meshObj = load("res://des.obj")
+	var meshObj = load("res://carteCasino.obj")
 	mi.mesh = meshObj
 	
 	# Associer une surface au dé
@@ -136,7 +162,7 @@ func createDes(couleur):
 	
 	# Associer la texture 
 	var texture = ImageTexture.new()
-	texture.load(couleur)
+	texture.load(desImages[couleur][nombre])
 	surface_material.albedo_texture = texture
 	
 	# Ajouter le dé en tant que child
