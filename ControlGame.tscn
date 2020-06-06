@@ -8,10 +8,10 @@
 [node name="ControlGame" type="Control"]
 anchor_right = 1.0
 anchor_bottom = 1.0
-margin_left = 0.950073
-margin_top = 3.05
-margin_right = 0.950073
-margin_bottom = 3.04999
+margin_left = 1.95007
+margin_top = 1.05
+margin_right = 1.95007
+margin_bottom = 1.04999
 script = ExtResource( 1 )
 __meta__ = {
 "_edit_use_anchors_": false
@@ -71,20 +71,13 @@ __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="TextEdit" type="Label" parent="."]
-margin_left = 765.65
-margin_top = 37.85
-margin_right = 984.65
-margin_bottom = 61.85
+[node name="Label" type="Label" parent="."]
+margin_left = 771.001
+margin_top = 45.0
+margin_right = 903.001
+margin_bottom = 59.0
 text = "Choisis le numéro :"
 __meta__ = {
 "_edit_use_anchors_": false
 }
-
-[node name="Score" type="Label" parent="."]
-margin_left = 35.0
-margin_top = 465.0
-margin_right = 75.0
-margin_bottom = 479.0
-text = "Score : 0"
 [connection signal="pressed" from="ButtonMenu" to="." method="_on_ButtonMenu_pressed"]
