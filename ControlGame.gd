@@ -59,18 +59,11 @@ func lancer_des():
 	
 	SpatialNode.afficher_des(des)
 	
-	_on_ItemList_item_selected(des)-1
+	var de_choisi = _on_ItemList_item_selected(des)-1
 	
 	
-#	SpatialNode.remove_des(des,imax)
-	
-#	return des
-	######Recuperer le choix du joueur####
-	
-	# Pour l'instant envoyer au pif, changer bientot !#
-#	print ("sending UDP test data to "+global.ipAddress+" port 4242")
-	#global.controlMenuNode.socket.put_packet(("P %d %d %d"%[id,des[imax],imax]).to_ascii())
-
+	SpatialNode.remove_des(des,de_choisi)
+	global.controlMenuNode.socket.put_packet(("P %d %d %d"%[id,des[de_choisi],de_choisi]).to_ascii())
 
 func createTile(x,y,tilenum):
 	# Create a new tile instance
@@ -126,16 +119,10 @@ func _on_ItemList_item_selected(des):
 	# On attend
 	while(itemlist.is_anything_selected ( )==false):
 		pass
-	print("Qqh s'est passsé")
 	
 	var ItemNo = itemlist.get_selected_items()
-	print("J'ai choisi qqh")
 	
 	var mon_des=int(itemlist.get_item_text(ItemNo[0]))
-	print("J'ai choisi %d"%mon_des)
-	print(des)
-	global.controlMenuNode.socket.put_packet(("P %d %d %d"%[id,des[mon_des-1],mon_des-1]).to_ascii())
-	
-	print(mon_des)
+	return mon_des
 	
 
