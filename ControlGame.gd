@@ -23,10 +23,10 @@ func _networkMessage(mess):
 			
 		'D': #Ajouter des dés à un casino
 			SpatialNode.add_des_cas(int(mess[1]),int(mess[2]),int(mess[3]))
+			pass
 			
-			pass
-		'L':
-			pass
+		'R': #Récupérer un billet
+			Spatial.recup_billet_cas(int(mess[1]),int(mess[2]))
 		'S':
 			pass
 		'I' : # Set id

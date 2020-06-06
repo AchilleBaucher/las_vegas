@@ -35,13 +35,15 @@ var casinoImages = [
 var desImages = [
 	"res://images/des/W.jpg",
 	"res://images/des/B.jpg",
+	"res://images/des/P.jpg",
 	"res://images/des/G.jpg",
-	"res://images/des/N.jpg",
 	"res://images/des/Y.jpg",
-	"res://images/des/R.jpg"]
+	"res://images/des/R.jpg",
+	"res://images/des/M.jpg",
+	"res://images/des/N.jpg"]
 
 # Répartition des dés des joueurs
-var repartition = [null,null,null,null,null,null]
+#var repartition = [null,null,null,null,null,null]
 
 # Les noeuds des casinos 
 var casinoNode = [null,null,null,null,null,null]
@@ -55,6 +57,7 @@ var billets_casinos = [
 	[],
 	[]]
 
+var mes_billets = []
 # Les dés de chaque casino
 var des_casinos = [
 	[],
@@ -222,6 +225,14 @@ func remove_des(des,nombre):
 	for de in to_erase:
 		remove_child(de)
 		des_joueur.erase(de)
+
+func recup_billet_cas(casino, billet):
+	billets_casinos[casino][billet].set_translation(Vector3(14,mes_billets.size()*0.1,-mes_billets.size()))
+	mes_billets.append(billets_casinos[casino][billet])
+
+func remove_billet_cas(casino, billet):
+	remove_child(billets_casinos[casino][billet])
+	billets_casinos[casino].erase(billets_casinos[casino][billet])
 	
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 #func _process(delta):
