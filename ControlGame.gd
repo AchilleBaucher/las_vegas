@@ -18,7 +18,7 @@ func _networkMessage(mess):
 	print ("_networkMessage=",mess)
 	match mess[0]:
 		'B': # Ajouter un billet à un casino
-			SpatialNode.add_billet_cas(int(mess[1]),int(mess[2]))
+			SpatialNode.add_billet_cas(int(mess[1]),int(mess[2])-1)
 			
 		'T': # A mon tour, je lance les dés
 			var des =lancer_des()
@@ -29,11 +29,11 @@ func _networkMessage(mess):
 			pass
 			
 		'R': #Récupérer un billet
-			SpatialNode.recup_billet(int(mess[1]))
+			SpatialNode.recup_billet(int(mess[1])-1)
 			score = score + (int(mess[1])+1)*10000
 			get_tree().get_root().get_node("ControlGame").get_node("Score").set_text("Score : %d"%score)
 			
-		'M': # Reset la partie
+		'M': # Nouvelle manche
 			SpatialNode.nouvelle_manche()
 			SpatialNode.creer_des(id)
 			

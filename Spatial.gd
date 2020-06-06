@@ -227,7 +227,7 @@ func remove_des(des,nombre):
 		des_joueur.erase(de)
 
 func recup_billet(billet):
-	mes_billets.append(createBillet(14,mes_billets.size()*0.1,-mes_billets.size(),billet))
+	mes_billets.append(createBillet(14,mes_billets.size()*0.1,10-mes_billets.size(),billet))
 
 #func remove_billet_cas(casino, billet):
 #	remove_child(billets_casinos[casino][billet])

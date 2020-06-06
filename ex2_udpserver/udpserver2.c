@@ -15,7 +15,7 @@
 #define MAXLINE 	1024
 #define NB_MAX_JOUEURS 1
 #define NB_CASINOS 6
-#define NB_MANCHES 3
+#define NB_MANCHES 0
 
 // <<<<<<<<<<<<<<<<<<<<<<<<<<<< Initialisation >>>>>>>>>>>>>>>>>>>>
 
@@ -174,9 +174,9 @@ void distribuer_billets()
 
 		// Tri par sélection des billets
 		int c;
-		for(int u=0;u<NB_MAX_JOUEURS-1;u++)
+		for(int u=0;u<5-1;u++)
 		{
-			for(int v=u+1;v<NB_MAX_JOUEURS;v++)
+			for(int v=u+1;v<5;v++)
 		    {
 		    	if ( casinos[i].billets[u] > casinos[i].billets[v] )
 		        {
@@ -199,7 +199,7 @@ void distribuer_billets()
         // Pour chaque billet
 		{
             // Envoyer le message du billet
-			sprintf(reply,"B%d%d",j,casinos[j].billets[k]-1);
+			sprintf(reply,"B%d%d",j,casinos[j].billets[k]);
 			message_tous(reply);
 		}
 	}
@@ -215,7 +215,7 @@ void trie_selec_indice(int* tableau_val, int* tableau_ind, int N)
 	{
 		for(int j=i+1;j<N;j++)
 	    {
-	    	if ( tableau_val[i] > tableau_val[j] )
+	    	if ( tableau_val[i] < tableau_val[j] )
 	        {
 	        	// On trie le tableau du nombre de des
 	            c = tableau_val[i];
@@ -229,52 +229,68 @@ void trie_selec_indice(int* tableau_val, int* tableau_ind, int N)
 	        }
 	    }
 	}
-
-
 }
 
 
-void gains(int nb_client)
+void gains()
 {
 	for (int i = 0; i<NB_CASINOS; i++)
 	{
 		printf("--------------------\nCasino %d\n--------------------\n" ,i);
-		int k = 0;
+		int k = 0; // Numéro de billet
+        for(int b=0;b<casinos[i].nb_billets;b++)
+            printf("%d : %d\n" , b, casinos[i].billets[b]);
+
 		// Tableau des indices des des
-		int indice_des[nb_client];
+		int indice_des[nb_clients];
 		// On initialise le tableau des indices
-		for (int a = 0; a<nb_client; a++)
+		for (int a = 0; a<nb_clients; a++)
 		{
 			indice_des[a] = a;
 		}
 
-		for (int y = 0; y < nb_client; y++)
+        for (int y = 0; y < nb_clients; y++)
 		{
-			printf("REP DES %d\nIND JOUEUR %D\n" ,casinos[i].rep_des[y], indice_des[y]);
+			printf("Avant tri, Joueur %d a %d dés\n" , y, casinos[i].rep_des[y]);
 		}
 
-		trie_selec_indice(casinos[i].rep_des, indice_des, nb_client);
+		trie_selec_indice(casinos[i].rep_des, indice_des, nb_clients);
 
-		for (int j = 0; j<nb_client; j++)
+		for (int y = 0; y < nb_clients; y++)
+		{
+			printf("Après tri, Joueur %d a %d dés\n" , indice_des[y], casinos[i].rep_des[y]);
+		}
+
+		int flag = 0;
+        char reply[MAXLINE];
+		for (int j = 0; j<nb_clients; j++)
 		{
 			// on s'assure que le client n'a pas un nombre de dés égale à un ou plusieurs autres joueurs
 			while(casinos[i].rep_des[j] == casinos[i].rep_des[j+1])
 			{
 				j++;
-				if (casinos[i].rep_des[j] != casinos[i].rep_des[j+1])
-				{
-					j++;
-				}
+				flag = 1;
+			}
+			if (flag){
+				j++;
+				flag = 0;
 			}
 
-			printf("Le client %d reçoit le billet %d du casino %d\n",indice_des[j],k ,i);
-			// on augmente le nombre de billet
-			tcpClients[indice_des[j]].nbrBilet++;
-			// On ajoute la valeur du score
-			tcpClients[indice_des[j]].score += casinos[i].billets[k];
-			k++;
+			if (j<nb_clients && (casinos[i].rep_des[j] != casinos[i].rep_des[j-1] || j==0) && casinos[i].rep_des[j] !=0){
+				printf("Le client %d reçoit le billet n%d (%d0000)du casino %d\n",indice_des[j],k,casinos[i].billets[k] ,i);
+                sprintf(reply,"R%d",casinos[i].billets[k]);
+                message_to(indice_des[j],reply);
+				// on augmente le nombre de billet
+				tcpClients[indice_des[j]].nbrBilet++;
+				// On ajoute la valeur du score
+				tcpClients[indice_des[j]].score += casinos[i].billets[k];
+				k++;
+			}
+
 		}
+
 	}
+
 }
 
 // Place les nb_d dés du joueur id_j sur le casino no_c
@@ -282,9 +298,10 @@ void placer_des_casino(int id_j, int nb_d, int no_c)
 {
     if(tcpClients[id_j].nb_des -nb_d >= 0)
     {
+        printf("Alors pour %d on met %d dés sur le casino %d\n",id_j,nb_d,no_c);
         // Enlever le nombre de dés au joueur et ajouter ses dés sur le casino
         tcpClients[id_j].nb_des = tcpClients[id_j].nb_des - nb_d;
-        casinos[no_c].rep_des[id_j] = nb_d;
+        casinos[no_c].rep_des[id_j] += nb_d;
     }
 
 }
@@ -327,7 +344,7 @@ void tour_suivant(int idj)
     // Manche suivante
     else
     {
-        // gains();
+        gains();
         if(manche_en_cours!=4)
             nouvelle_manche();
         else
