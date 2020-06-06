@@ -15,6 +15,7 @@
 #define MAXLINE 	1024
 #define NB_MAX_JOUEURS 1
 #define NB_CASINOS 6
+#define NB_MANCHES 4
 
 // <<<<<<<<<<<<<<<<<<<<<<<<<<<< Initialisation >>>>>>>>>>>>>>>>>>>>
 
@@ -29,7 +30,7 @@ struct _client
 
 // Nombre de joueurs participants
 int nb_clients;
-
+int manche_en_cours;
 // Un casino, contient ses billets et ses dés
 struct _casino
 {
@@ -42,7 +43,7 @@ struct _casino
 } casinos[NB_CASINOS];
 
 // Indique combien il reste de dés au total
-int nb_total_des(int nb_clients)
+int nb_total_des()
 {
     int sum = 0;
     for(int i=0; i < nb_clients;i++)
@@ -51,7 +52,7 @@ int nb_total_des(int nb_clients)
 }
 
 // Indique s'il reste au moins un dé en jeu
-int reste_un_de(int nb_clients)
+int reste_un_de()
 {
     for (size_t i = 0; i < nb_clients; i++)
         if(tcpClients[i].nb_des != 0)
@@ -189,14 +190,51 @@ void placer_des_casino(int id_j, int nb_d, int no_c)
 
 }
 
-// Demande de à idj de lancer les dés
-void tour_suivant(int idj,int nb_clients)
+
+// Démarre une nouvelle manche
+void nouvelle_manche()
 {
-    if(reste_un_de(nb_clients))
-        sendMessageToGodotClient(tcpClients[idj].ipAddress,tcpClients[idj].port,"T");
-    // else
-    //     gains(nb_clients)
+    manche_en_cours++;
+    for(int i=0;i<nb_clients;i++)
+        sendMessageToGodotClient(tcpClients[i].ipAddress,tcpClients[i].port,"M");
+    distribuer_billets();
+    sendMessageToGodotClient(tcpClients[0].ipAddress,tcpClients[0].port,"T");
 }
+
+
+// Qui a le plus d'argent
+int gagnant()
+{
+    return 0;
+}
+
+// Fin de la partie, déclare le vainqueur
+void fin_partie()
+{
+    char reply[MAXLINE];
+    int g = gagnant();
+    sprintf(reply,"F%d",g);
+    for(int i=0;i<nb_clients;i++)
+        sendMessageToGodotClient(tcpClients[g].ipAddress,tcpClients[g].port,reply);
+}
+
+// Demande de à idj de lancer les dés
+void tour_suivant(int idj)
+{
+    if(reste_un_de())
+        sendMessageToGodotClient(tcpClients[idj].ipAddress,tcpClients[idj].port,"T");
+
+    // Manche suivante
+    else
+    {
+        // gains();
+        if(manche_en_cours!=4)
+            nouvelle_manche();
+        else
+            fin_partie();
+    }
+}
+
 
 
 // 0:attente, 1: en cours, 2:fin
@@ -297,7 +335,7 @@ int main()
 					{
 						statut_partie =1;
 						distribuer_billets();
-                        tour_suivant(0,nb_clients);					}
+                        tour_suivant(0);					}
 
                     break;
 
@@ -347,7 +385,7 @@ int main()
     						sendMessageToGodotClient(tcpClients[i].ipAddress,tcpClients[i].port,des_ajoutes);
     					}
                         id_joueur_en_cours = (id_joueur_en_cours+1)%nb_clients;
-                        tour_suivant(id_joueur_en_cours,nb_clients);
+                        tour_suivant(id_joueur_en_cours);
                     }
 				    break;
 
