@@ -20,6 +20,7 @@ func _networkMessage(mess):
 			
 		'T': # A mon tour, je lance les dés
 			var des =lancer_des()
+			get_tree().get_root().get_node("ControlGame").get_node("ItemList").clear()
 			
 		'D': #Ajouter des dés à un casino
 			SpatialNode.add_des_cas(int(mess[1]),int(mess[2]),int(mess[3]))
@@ -134,6 +135,7 @@ func _on_ItemList_item_selected(des):
 	print("J'ai choisi %d"%mon_des)
 	print(des)
 	global.controlMenuNode.socket.put_packet(("P %d %d %d"%[id,des[mon_des-1],mon_des-1]).to_ascii())
+	
 	print(mon_des)
 	
 
