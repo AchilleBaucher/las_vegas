@@ -22,6 +22,10 @@ func _process(delta):
 		translation.z-=delta * coef
 	if Input.is_action_pressed("ui_left"):
 		translation.z+=delta * coef
+	if Input.is_action_pressed("ui_zoom"):
+		translation.y-=delta * coef
+	if Input.is_action_pressed("ui_dezoom"):
+		translation.y+=delta * coef
 		
 #		if Input.is_joy_button_pressed(0,JOY_BUTTON_5) and pressed[0]==0:
 #			pressed[0]=1
