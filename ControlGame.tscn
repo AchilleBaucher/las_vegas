@@ -8,8 +8,10 @@
 [node name="ControlGame" type="Control"]
 anchor_right = 1.0
 anchor_bottom = 1.0
-margin_top = 4.0
-margin_bottom = 4.0
+margin_left = 0.950073
+margin_top = 3.05
+margin_right = 0.950073
+margin_bottom = 3.04999
 script = ExtResource( 1 )
 __meta__ = {
 "_edit_use_anchors_": false
@@ -19,7 +21,7 @@ __meta__ = {
 script = ExtResource( 3 )
 
 [node name="Camera" type="Camera" parent="Spatial"]
-transform = Transform( -8.02829e-08, -0.870158, 0.492772, -1.41768e-07, 0.492772, 0.870158, -1, -2.98428e-13, -1.62921e-07, 13.7853, 15.6808, 0 )
+transform = Transform( -8.68431e-08, -0.846091, 0.533038, -1.37846e-07, 0.533038, 0.846091, -1, -2.91323e-13, -1.62921e-07, 9.99092, 10, 0 )
 script = ExtResource( 2 )
 
 [node name="Board" type="MeshInstance" parent="Spatial"]
@@ -48,14 +50,32 @@ anchor_left = 0.484
 anchor_top = 0.141
 anchor_right = 0.484
 anchor_bottom = 0.141
-margin_left = -37.0
-margin_top = 83.4
-margin_right = 436.0
-margin_bottom = 103.4
+margin_left = 21.5797
+margin_top = -75.6022
+margin_right = 494.58
+margin_bottom = -55.6022
 action_mode = 0
 text = "test"
 __meta__ = {
 "_edit_use_anchors_": false,
 "_editor_description_": ""
 }
+
+[node name="ItemList" type="ItemList" parent="."]
+margin_left = 768.9
+margin_top = 64.8
+margin_right = 984.9
+margin_bottom = 132.8
+max_text_lines = 6
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="TextEdit" type="TextEdit" parent="."]
+margin_left = 765.65
+margin_top = 37.85
+margin_right = 984.65
+margin_bottom = 61.85
+text = "Choisis le numéro :"
 [connection signal="pressed" from="ButtonMenu" to="." method="_on_ButtonMenu_pressed"]
+[connection signal="item_activated" from="ItemList" to="." method="_on_ItemList_item_activated"]

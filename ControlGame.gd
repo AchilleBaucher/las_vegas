@@ -6,7 +6,8 @@ var id
 func _ready():
 	id = -1
 	SpatialNode = get_tree().get_root().get_node("ControlGame").get_node("Spatial")
-
+	#get_tree().get_root().get_node("ControlGame").get_node("Spatial").get_node("TextEdit").remove_child() 
+	#get_tree().get_root().get_node("ControlGame").get_node("Spatial").get_node("ItemList").hide()
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 #func _process(delta):
 #	pass
@@ -19,7 +20,8 @@ func _networkMessage(mess):
 			
 		'T': # A mon tour, je lance les dés
 			if id!=-1:
-				lancer_des()
+				var des =lancer_des()
+				_on_ItemList_item_activated(des)
 			
 		'D': #Ajouter des dés à un casino
 			SpatialNode.add_des_cas(int(mess[1]),int(mess[2]),int(mess[3]))
@@ -49,7 +51,6 @@ func lancer_des():
 	print("Tirer %d dés"%nb_d)
 	for i in range(nb_d):
 		des[randi()%6] += 1
-	
 	var imax = 0
 	for i in range(des.size()):
 		if des[i] > des[imax] :
@@ -57,9 +58,14 @@ func lancer_des():
 			
 	SpatialNode.afficher_des(des)
 	SpatialNode.remove_des(des,imax)
+	
+	return des
+	######Recuperer le choix du joueur####
+	
 	# Pour l'instant envoyer au pif, changer bientot !#
 #	print ("sending UDP test data to "+global.ipAddress+" port 4242")
-	global.controlMenuNode.socket.put_packet(("P %d %d %d"%[id,des[imax],imax]).to_ascii())
+	#global.controlMenuNode.socket.put_packet(("P %d %d %d"%[id,des[imax],imax]).to_ascii())
+
 
 func createTile(x,y,tilenum):
 	# Create a new tile instance
@@ -103,3 +109,13 @@ func createExplorer(x,y,num):
 	# add the newly created instance as a child of the Origine3D Node
 	$Spatial.add_child(mi)
 	return mi
+
+
+func _on_ItemList_item_activated(des):
+	var itemlist=get_tree().get_root().get_node("ControlGame").get_node("Spatial").git_node("ItemList")
+	for i in range(len(des)):
+		if des[i]!=0:
+			itemlist.add_item(str(i))
+	var ItemNo = itemlist.get_selected_items()
+	var mon_des=itemlist.get_item_text(ItemNo)
+	print(mon_des)
