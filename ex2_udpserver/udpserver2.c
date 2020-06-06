@@ -13,7 +13,7 @@
 #define PORT	 	4242
 #define GODOT_PORT	4000
 #define MAXLINE 	1024
-#define NB_MAX_JOUEURS 1
+#define NB_MAX_JOUEURS 2
 #define NB_CASINOS 6
 
 // <<<<<<<<<<<<<<<<<<<<<<<<<<<< Initialisation >>>>>>>>>>>>>>>>>>>>
@@ -25,6 +25,8 @@ struct _client
     int port;
     char name[40];
     int nb_des;
+    int nbrBilet;
+    int score;
 } tcpClients[NB_MAX_JOUEURS];
 
 // Nombre de joueurs participants
@@ -135,6 +137,22 @@ void distribuer_billets()
 			total+=casinos[i].billets[j];
 			casinos[i].nb_billets+=1;
 		}
+
+		// Tri par sélection des billets
+		int c;
+		for(int u=0;u<4;u++)
+		{
+			for(int v=u+1;v<5;v++)
+		    {
+		    	if ( casinos[i].billets[u] > casinos[i].billets[v] ) 
+		        {
+		            c = casinos[i].billets[u];
+		            casinos[i].billets[u] = casinos[i].billets[v];
+		            casinos[i].billets[v] = c;
+		        }
+		    }
+		}
+
 	}
 
     // Ceci fait, on envoie à tous les clients du jeu les nouveaux billets
@@ -155,9 +173,85 @@ void distribuer_billets()
                 // Envoyer le message du billet
 				sprintf(reply,"B%d%d",j,casinos[j].billets[k]-1);
 				sendMessageToGodotClient(tcpClients[i].ipAddress,tcpClients[i].port, reply);
+
 			}
 		}
 	}
+}
+
+
+
+void trie_selec_indice(int* tableau_val, int* tableau_ind, int N)
+{
+	// Tri par sélection 
+	int c;
+	for(int i=0;i<N-1;i++)
+	{
+		for(int j=i+1;j<N;j++)
+	    {
+	    	if ( tableau_val[i] > tableau_val[j] ) 
+	        {
+	        	// On trie le tableau du nombre de des
+	            c = tableau_val[i];
+	            tableau_val[i] = tableau_val[j];
+	            tableau_val[j] = c;
+
+	            // On trie le tableau des indices des des avec le même ordre
+	            c = tableau_ind[i];
+	            tableau_ind[i] = tableau_ind[j];
+	            tableau_ind[j] = c;
+	        }
+	    }
+	}
+
+
+}
+
+
+void gains(int nb_client)
+{
+	for (int i = 0; i<NB_CASINOS; i++)
+	{
+		printf("--------------------\nCasino %d\n--------------------\n" ,i);
+		int k = 0;
+		// Tableau des indices des des
+		int indice_des[nb_client];
+		// On initialise le tableau des indices
+		for (int a = 0; a<nb_client; a++)
+		{
+			indice_des[a] = a;
+		}
+
+		for (int y = 0; y < nb_client; y++)
+		{
+			printf("REP DES %d\nIND JOUEUR %D\n" ,casinos[i].rep_des[y], indice_des[y]);
+		}
+
+		trie_selec_indice(casinos[i].rep_des, indice_des, nb_client);
+
+		for (int j = 0; j<nb_client; j++)
+		{
+			// on s'assure que le client n'a pas un nombre de dés égale à un ou plusieurs autres joueurs
+			while(casinos[i].rep_des[j] == casinos[i].rep_des[j+1])
+			{
+				j++;
+				if (casinos[i].rep_des[j] != casinos[i].rep_des[j+1])
+				{
+					j++;
+				}
+			}
+
+			printf("Le client %d reçoit le billet %d du casino %d\n",indice_des[j],k ,i);
+			// on augmente le nombre de billet
+			tcpClients[indice_des[j]].nbrBilet++;
+			// On ajoute la valeur du score
+			tcpClients[indice_des[j]].score += casinos[i].billets[k];
+			k++;
+
+		}
+		
+	}
+
 }
 
 // Place les nb_d dés du joueur id_j sur le casino no_c
@@ -272,6 +366,8 @@ int main()
 						sendMessageToGodotClient(tcpClients[i].ipAddress,tcpClients[i].port,ilreste);
 					}
 
+					
+					statut_partie =1;//!\\
                     // Si le nombre est atteint, on commence
 					if(nb_clients >= NB_MAX_JOUEURS)
 					{
@@ -294,6 +390,22 @@ int main()
 		{
 			switch(buffer[0])
 			{
+
+				case 'X' ://Distribtion des gains
+					gains(2);
+					casinos[0].rep_des[0] = 4;
+					casinos[0].rep_des[1] = 4;
+					for (int i =1; i<5; i++){
+						casinos[0].rep_des[0] = 0;
+						casinos[0].rep_des[0] = 0;
+					}
+
+                	sprintf(reply,"Tiens voilà tes billets");
+                    sendMessageToGodotClient(addresse_client,port_client,reply);
+                    break;
+
+
+
 				case 'C' : ;// Connection à refuser
 
 					sprintf(reply,"W Partie déjà en cours");
