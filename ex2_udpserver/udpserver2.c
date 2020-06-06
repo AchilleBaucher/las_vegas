@@ -164,21 +164,26 @@ void distribuer_billets()
 		total = 0;
         casinos[i].nb_billets=0;
         // Tant qu'on es pas à plus de 50 000
-		for (int j=0;j<5 && total <5;j++)
+		for (int j=0;j<5;j++)
 		{
             // On met un nouveau billet aléatoirement
-			casinos[i].billets[j]=rand()%9+1;
-			total+=casinos[i].billets[j];
-			casinos[i].nb_billets+=1;
+            casinos[i].billets[j]=0;
+            if(total <5)
+            {
+		         casinos[i].billets[j]=rand()%9+1;
+		         total+=casinos[i].billets[j];
+                 casinos[i].nb_billets+=1;
+                 printf("Ajouter billet %d0000\n",casinos[i].billets[j]);
+             }
 		}
 
 		// Tri par sélection des billets
 		int c;
-		for(int u=0;u<5-1;u++)
+		for(int u=0;u<4;u++)
 		{
 			for(int v=u+1;v<5;v++)
 		    {
-		    	if ( casinos[i].billets[u] > casinos[i].billets[v] )
+		    	if ( casinos[i].billets[u] < casinos[i].billets[v] )
 		        {
 		            c = casinos[i].billets[u];
 		            casinos[i].billets[u] = casinos[i].billets[v];
@@ -276,7 +281,7 @@ void gains()
 				flag = 0;
 			}
 
-			if (j<nb_clients && (casinos[i].rep_des[j] != casinos[i].rep_des[j-1] || j==0) && casinos[i].rep_des[j] !=0){
+			if (j<nb_clients && (casinos[i].rep_des[j] != casinos[i].rep_des[j-1] || j==0) && casinos[i].rep_des[j] !=0 && k <= casinos[i].nb_billets){
 				printf("Le client %d reçoit le billet n%d (%d0000)du casino %d\n",indice_des[j],k,casinos[i].billets[k] ,i);
                 sprintf(reply,"R%d",casinos[i].billets[k]);
                 message_to(indice_des[j],reply);
@@ -314,6 +319,9 @@ void nouvelle_manche()
     message_tous("M");
     for(int i=0;i<nb_clients;i++)
         tcpClients[i].nb_des = 8;
+    for (size_t i = 0; i < NB_CASINOS; i++)
+        for(int j=0;j<nb_clients;j++)
+            casinos[i].rep_des[j] = 0;
     distribuer_billets();
     message_to(0,"T");
 }
