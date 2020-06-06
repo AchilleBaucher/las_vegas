@@ -14,17 +14,17 @@ func _ready():
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta):
-	if Input.is_action_pressed("ui_up"):
+	if Input.is_action_pressed("cam_up"):
 		translation.x-=delta * coef
-	if Input.is_action_pressed("ui_down"):
+	if Input.is_action_pressed("cam_down"):
 		translation.x+=delta * coef
-	if Input.is_action_pressed("ui_right"):
+	if Input.is_action_pressed("cam_right"):
 		translation.z-=delta * coef
-	if Input.is_action_pressed("ui_left"):
+	if Input.is_action_pressed("cam_left"):
 		translation.z+=delta * coef
-	if Input.is_action_pressed("ui_zoom"):
+	if Input.is_action_pressed("cam_zoom"):
 		translation.y-=delta * coef
-	if Input.is_action_pressed("ui_dezoom"):
+	if Input.is_action_pressed("cam_dezoom"):
 		translation.y+=delta * coef
 		
 #		if Input.is_joy_button_pressed(0,JOY_BUTTON_5) and pressed[0]==0:
