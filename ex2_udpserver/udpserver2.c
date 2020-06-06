@@ -13,7 +13,7 @@
 #define PORT	 	4242
 #define GODOT_PORT	4000
 #define MAXLINE 	1024
-#define NB_MAX_JOUEURS 6
+#define NB_MAX_JOUEURS 1
 #define NB_CASINOS 6
 
 // <<<<<<<<<<<<<<<<<<<<<<<<<<<< Initialisation >>>>>>>>>>>>>>>>>>>>
@@ -175,9 +175,7 @@ void placer_des_casino(int id_j, int nb_d, int no_c)
 // Demande de à idj de lancer les dés
 void tour_suivant(int idj)
 {
-    char reply[MAXLINE];
-    sprintf(reply,"T%d%d",idj,tcpClients[idj].nb_des);
-    sendMessageToGodotClient(tcpClients[idj].ipAddress,tcpClients[idj].port,reply);
+    sendMessageToGodotClient(tcpClients[idj].ipAddress,tcpClients[idj].port,"T");
 }
 
 
@@ -259,7 +257,12 @@ int main()
 					sprintf(tcpClients[nb_clients].ipAddress,addresse_client);
 					tcpClients[nb_clients].port=port_client;
                     tcpClients[nb_clients].nb_des = 8;
-					repondre_connection(nb_clients++,reply);
+
+
+                    // Indiquer son ID au nouveau joueur, obligatoire
+                    sprintf(reply,"I%d",nb_clients);
+                    sendMessageToGodotClient(addresse_client,port_client,reply);
+                    nb_clients++;
 
                     // Indiquer à chacun combien il reste de joueurs pour commencer
                     char ilreste[MAXLINE];
@@ -292,7 +295,7 @@ int main()
 			switch(buffer[0])
 			{
 				case 'C' : ;// Connection à refuser
-                
+
 					sprintf(reply,"W Partie déjà en cours");
 	                break;
 
@@ -301,13 +304,13 @@ int main()
                     // Le joueur id place nb_d dés sur le casino no_c
 					int id_j, nb_d, no_c;
 					sscanf(buffer,"P %d %d %d",&id_j,&nb_d,&no_c);
-
+                    printf("Recu de %d : mettre %d dés sur le casino %d\n",id_j,nb_d,no_c);
                     // Cas d'erreur :
 					if(id_j!=id_joueur_en_cours)
 						sprintf(reply,"W Ce n'est pas à toi (%d) de lancer mais à %d",id_j, id_joueur_en_cours);
                     else if(nb_d > tcpClients[id_j].nb_des | nb_d < 1)
 						sprintf(reply,"W Nombre de dés (%d) incorrect",nb_d);
-                    else if(no_c < 1 | no_c > NB_CASINOS)
+                    else if(no_c < 0 | no_c > NB_CASINOS)
 						sprintf(reply,"W Numéro de casino (%d) incorrect",no_c);
 
                     // Cas de non erreur
@@ -322,8 +325,8 @@ int main()
     					{
     						sendMessageToGodotClient(tcpClients[i].ipAddress,tcpClients[i].port,des_ajoutes);
     					}
-
-                        tour_suivant(++id_joueur_en_cours);
+                        id_joueur_en_cours = (id_joueur_en_cours+1)%nb_clients;
+                        tour_suivant(id_joueur_en_cours);
                     }
 				    break;
 

@@ -24,14 +24,21 @@ var casinoImages = [
 	"res://images/casinos/5.jpg",
 	"res://images/casinos/6.jpg"]
 	
+#var desImages = [
+#	["res://images/des/1W.jpg","res://images/des/2W.jpg","res://images/des/3W.jpg","res://images/des/4W.jpg","res://images/des/5W.jpg","res://images/des/6W.jpg"],
+#	["res://images/des/1B.jpg","res://images/des/2B.jpg","res://images/des/3B.jpg","res://images/des/4B.jpg","res://images/des/5B.jpg","res://images/des/6B.jpg"],
+#	["res://images/des/1G.jpg","res://images/des/2G.jpg","res://images/des/3G.jpg","res://images/des/4G.jpg","res://images/des/5G.jpg","res://images/des/6G.jpg"],
+#	["res://images/des/1N.jpg","res://images/des/2N.jpg","res://images/des/3N.jpg","res://images/des/4N.jpg","res://images/des/5N.jpg","res://images/des/6N.jpg"],
+#	["res://images/des/1Y.jpg","res://images/des/2Y.jpg","res://images/des/3Y.jpg","res://images/des/4Y.jpg","res://images/des/5Y.jpg","res://images/des/6Y.jpg"],
+#	["res://images/des/1R.jpg","res://images/des/2R.jpg","res://images/des/3R.jpg","res://images/des/4R.jpg","res://images/des/5R.jpg","res://images/des/6R.jpg"]
+#]
 var desImages = [
-	["res://images/des/1W.jpg","res://images/des/2W.jpg","res://images/des/3W.jpg","res://images/des/4W.jpg","res://images/des/5W.jpg","res://images/des/6W.jpg"],
-	["res://images/des/1B.jpg","res://images/des/2B.jpg","res://images/des/3B.jpg","res://images/des/4B.jpg","res://images/des/5B.jpg","res://images/des/6B.jpg"],
-	["res://images/des/1G.jpg","res://images/des/2G.jpg","res://images/des/3G.jpg","res://images/des/4G.jpg","res://images/des/5G.jpg","res://images/des/6G.jpg"],
-	["res://images/des/1N.jpg","res://images/des/2N.jpg","res://images/des/3N.jpg","res://images/des/4N.jpg","res://images/des/5N.jpg","res://images/des/6N.jpg"],
-	["res://images/des/1Y.jpg","res://images/des/2Y.jpg","res://images/des/3Y.jpg","res://images/des/4Y.jpg","res://images/des/5Y.jpg","res://images/des/6Y.jpg"],
-	["res://images/des/1R.jpg","res://images/des/2R.jpg","res://images/des/3R.jpg","res://images/des/4R.jpg","res://images/des/5R.jpg","res://images/des/6R.jpg"]
-]
+	"res://images/des/W.jpg",
+	"res://images/des/B.jpg",
+	"res://images/des/G.jpg",
+	"res://images/des/N.jpg",
+	"res://images/des/Y.jpg",
+	"res://images/des/R.jpg"]
 
 # Répartition des dés des joueurs
 var repartition = [null,null,null,null,null,null]
@@ -58,6 +65,10 @@ var des_casinos = [
 	[],
 ]
 
+var des_joueur = []
+
+var id
+
 func _ready():
 	# Le noeud vers spatial (C6)
 	SpatialNode = get_tree().get_root().get_node("ControlGame").get_node("Spatial")
@@ -68,6 +79,7 @@ func _ready():
 	for i in range(6):
 		var posz = poscasinos(i)
 		casinoNode[i] = createCasino(0,0,posz,casinoImages[i])
+	
 
 # <<<<<<<<<<<<<<<<<<<<<<<<<<<<< CRÉATION DE NOEUDS >>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
@@ -121,15 +133,15 @@ func createBillet(posx,posy,posz,nombre):
 	SpatialNode.add_child(mi)
 	return mi
 
-func createDe(posx,posy,posz,couleur,nombre):
+func createDe(posx,posy,posz,couleur,num):
 	#Créer un pointeur vers la nouvelle instance qu'on vient veut créer 
 	var mi = myMeshRessource.new()
 	
 	# Positioner le dé au bon endroit
 	mi.set_translation(Vector3(posx,posy,posz))
-	
+	roterde(mi,num)
 	# Récupérer le maillage de l'objet
-	var meshObj = load("res://carteCasino.obj")
+	var meshObj = load("res://blender/de01.obj")
 	mi.mesh = meshObj
 	
 	# Associer une surface au dé
@@ -138,7 +150,7 @@ func createDe(posx,posy,posz,couleur,nombre):
 	
 	# Associer la texture 
 	var texture = ImageTexture.new()
-	texture.load(desImages[couleur][nombre])
+	texture.load(desImages[couleur])
 	surface_material.albedo_texture = texture
 	
 	# Ajouter le dé en tant que child
@@ -146,6 +158,13 @@ func createDe(posx,posy,posz,couleur,nombre):
 	return mi
 	
 # <<<<<<<<<<<<<<<<<<<<<<<<<<<<< AUTRES FONCTIONS >>>>>>>>>>>>>>>>>>>>>>>>>>>>
+func creer_des(idj):
+	# Créer dynamiquement les noeuds des dés en fils de ce noeud là (C5)
+	for i in range(8):
+		des_joueur.append(createDe(12,0,i*1.2,idj,1))
+	
+
+
 # Position par défaut d'un casino en fonction de son numéro
 func poscasinos(num):
 	return 12*num-45	
@@ -157,19 +176,53 @@ func add_billet_cas(num, billet):
 	var posy = -(billets_casinos[num].size()+1)*0.01
 	var posz = poscasinos(num)+billets_casinos[num].size()*2 - 2
 	billets_casinos[num].append(createBillet(posx,posy,posz,billet))
-#	billets_casinos[num][billets_casinos[num].size()-1].set_rotation(Vector3(0,PI/2,0))
 	
 
 # Ajouter un nombre de dés des d'un joueur joueur au casino casino
 func add_des_cas(joueur, des, casino):
 	for d in range(des):
 		print("Ajouter %d dés au casino %d pour le joueur %d"%[des,casino,joueur])
-		var posx = -3-des_casinos[casino].size()*8
-		var posy = 0
+		var posx = 1-des_casinos[casino].size()*1.2
+		var posy = 1
 		var posz = poscasinos(casino)
-		des_casinos[casino].append(createDe(posx,posy,posz,joueur,casino))
+		des_casinos[casino].append(createDe(posx,posy,posz,joueur,casino+1))
 		
 
+# Affiche le résultat du tirage
+func afficher_des(des):
+	print("Afficher la répartition")
+	var cpt = 0
+	for i in range(des.size()):
+		for j in range(des[i]):
+			roterde(des_joueur[cpt],i+1)
+			des_joueur[cpt].set_translation(Vector3(12+j*1.2,2,-i*1.2))
+			cpt+=1
+
+
+func roterde(de,nombre):
+	match nombre :
+		1 : de.set_rotation(Vector3(PI/2,0,0))
+		2 : de.set_rotation(Vector3(0,0,PI/2))
+		3 : de.set_rotation(Vector3(0,0,0))
+		4 : de.set_rotation(Vector3(0,0,PI))
+		5 : de.set_rotation(Vector3(0,0,-PI/2))
+		6 : de.set_rotation(Vector3(-PI/2,0,0))
+
+func remove_des(des,nombre):
+	print("Retirer les dés numéro %d +1 = %d"%[nombre,nombre+1])
+	var to_erase = []
+	var cpt = 0
+	for i in range(des.size()):
+		for j in range(des[i]):
+			if i == nombre:
+				to_erase.append(des_joueur[cpt])
+			cpt+=1
+	
+	print("Donc retirer %d dés "%to_erase.size())
+	for de in to_erase:
+		remove_child(de)
+		des_joueur.erase(de)
+	
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 #func _process(delta):
 #	pass

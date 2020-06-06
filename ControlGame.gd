@@ -1,8 +1,10 @@
 extends Control
 
 var SpatialNode
+var id
 
 func _ready():
+	id = -1
 	SpatialNode = get_tree().get_root().get_node("ControlGame").get_node("Spatial")
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
@@ -16,7 +18,8 @@ func _networkMessage(mess):
 			SpatialNode.add_billet_cas(int(mess[1]),int(mess[2]))
 			
 		'T': # A mon tour, je lance les dés
-			lancer_des(int(mess[1]),int(mess[2]))
+			if id!=-1:
+				lancer_des()
 			
 		'D': #Ajouter des dés à un casino
 			SpatialNode.add_des_cas(int(mess[1]),int(mess[2]),int(mess[3]))
@@ -26,6 +29,10 @@ func _networkMessage(mess):
 			pass
 		'S':
 			pass
+		'I' : # Set id
+			if id == -1:
+				id = int(mess[1])
+				SpatialNode.creer_des(id)
 
 func _on_ButtonMenu_pressed():
 	var root=get_tree().get_root()
@@ -34,15 +41,25 @@ func _on_ButtonMenu_pressed():
 	root.remove_child(myself)
 	root.add_child(global.controlMenuNode)
 
-func lancer_des(idj,nb_d):
+func lancer_des():
 	# Tirer les dés
 	var des = [0,0,0,0,0,0]
+	var nb_d = SpatialNode.des_joueur.size()
+	
+	print("Tirer %d dés"%nb_d)
 	for i in range(nb_d):
 		des[randi()%6] += 1
 	
+	var imax = 0
+	for i in range(des.size()):
+		if des[i] > des[imax] :
+			imax = i
+			
+	SpatialNode.afficher_des(des)
+	SpatialNode.remove_des(des,imax)
 	# Pour l'instant envoyer au pif, changer bientot !#
-	print ("sending UDP test data to "+global.ipAddress+" port 4242")
-	global.controlMenuNode.socket.put_packet(("P %d %d %d"%[idj,1,des[0]]).to_ascii())
+#	print ("sending UDP test data to "+global.ipAddress+" port 4242")
+	global.controlMenuNode.socket.put_packet(("P %d %d %d"%[id,des[imax],imax]).to_ascii())
 
 func createTile(x,y,tilenum):
 	# Create a new tile instance
