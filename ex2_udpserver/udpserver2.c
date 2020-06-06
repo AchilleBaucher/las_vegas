@@ -15,7 +15,7 @@
 #define MAXLINE 	1024
 #define NB_MAX_JOUEURS 2
 #define NB_CASINOS 6
-#define NB_MANCHES 1
+#define NB_MANCHES 2
 
 // <<<<<<<<<<<<<<<<<<<<<<<<<<<< Initialisation >>>>>>>>>>>>>>>>>>>>
 
@@ -211,7 +211,7 @@ void distribuer_billets()
 }
 
 
-
+// Fonction de tri
 void trie_selec_indice(int* tableau_val, int* tableau_ind, int N)
 {
 	// Tri par sélection
@@ -236,15 +236,15 @@ void trie_selec_indice(int* tableau_val, int* tableau_ind, int N)
 	}
 }
 
-
+// Ditribution des gains avec une fonction très compliquée
 void gains()
 {
 	for (int i = 0; i<NB_CASINOS; i++)
 	{
-		printf("--------------------\nCasino %d\n--------------------\n" ,i);
+		// printf("--------------------\nCasino %d\n--------------------\n" ,i);
 		int k = 0; // Numéro de billet
-        for(int b=0;b<casinos[i].nb_billets;b++)
-            printf("%d : %d\n" , b, casinos[i].billets[b]);
+        // for(int b=0;b<casinos[i].nb_billets;b++)
+            // printf("%d : %d\n" , b, casinos[i].billets[b]);
 
 		// Tableau des indices des des
 		int indice_des[nb_clients];
@@ -254,17 +254,7 @@ void gains()
 			indice_des[a] = a;
 		}
 
-        // for (int y = 0; y < nb_clients; y++)
-		// {
-		// 	printf("Avant tri, Joueur %d a %d dés\n" , y, casinos[i].rep_des[y]);
-		// }
-
 		trie_selec_indice(casinos[i].rep_des, indice_des, nb_clients);
-
-		for (int y = 0; y < nb_clients; y++)
-		{
-			printf("Après tri, Joueur %d a %d dés\n" , indice_des[y], casinos[i].rep_des[y]);
-		}
 
 		int flag = 0;
         char reply[MAXLINE];
@@ -282,7 +272,7 @@ void gains()
 			}
 
 			if (j<nb_clients && (casinos[i].rep_des[j] != casinos[i].rep_des[j-1] || j==0) && casinos[i].rep_des[j] !=0 && k <= casinos[i].nb_billets){
-				printf("Le client %d reçoit le billet n%d (%d0000)du casino %d\n",indice_des[j],k,casinos[i].billets[k] ,i);
+				// printf("Le client %d reçoit le billet n%d (%d0000)du casino %d\n",indice_des[j],k,casinos[i].billets[k] ,i);
                 sprintf(reply,"R%d",casinos[i].billets[k]);
                 message_to(indice_des[j],reply);
 				// on augmente le nombre de billet
@@ -303,7 +293,7 @@ void placer_des_casino(int id_j, int nb_d, int no_c)
 {
     if(tcpClients[id_j].nb_des -nb_d >= 0)
     {
-        printf("Alors pour %d on met %d dés sur le casino %d\n",id_j,nb_d,no_c);
+        // printf("Alors pour %d on met %d dés sur le casino %d\n",id_j,nb_d,no_c);
         // Enlever le nombre de dés au joueur et ajouter ses dés sur le casino
         tcpClients[id_j].nb_des = tcpClients[id_j].nb_des - nb_d;
         casinos[no_c].rep_des[id_j] += nb_d;

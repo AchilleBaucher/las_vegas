@@ -15,7 +15,7 @@ func createNetworkThread():
 func _thread_network_function(userdata):
 	var done=false
 	socket = PacketPeerUDP.new()
-	var PORT = 4000 + 1
+	var PORT = 4000 + 2
 	if (socket.listen(PORT,global.ipAddress) != OK):
 		print("An error occurred listening on port 4000")
 		done = true;
