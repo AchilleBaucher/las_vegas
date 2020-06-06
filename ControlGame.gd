@@ -19,9 +19,8 @@ func _networkMessage(mess):
 			SpatialNode.add_billet_cas(int(mess[1]),int(mess[2]))
 			
 		'T': # A mon tour, je lance les dés
-			if id!=-1:
-				var des =lancer_des()
-				_on_ItemList_item_activated(des)
+			var des =lancer_des()
+			_on_ItemList_item_selected(des)
 			
 		'D': #Ajouter des dés à un casino
 			SpatialNode.add_des_cas(int(mess[1]),int(mess[2]),int(mess[3]))
@@ -46,7 +45,7 @@ func _on_ButtonMenu_pressed():
 func lancer_des():
 	# Tirer les dés
 	var des = [0,0,0,0,0,0]
-	var nb_d = SpatialNode.des_joueur.size()
+	var nb_d = 6 #SpatialNode.des_joueur.size()
 	
 	print("Tirer %d dés"%nb_d)
 	for i in range(nb_d):
@@ -111,11 +110,17 @@ func createExplorer(x,y,num):
 	return mi
 
 
-func _on_ItemList_item_activated(des):
-	var itemlist=get_tree().get_root().get_node("ControlGame").get_node("Spatial").git_node("ItemList")
+
+func _on_ItemList_item_selected(des):
+	var itemlist=get_tree().get_root().get_node("ControlGame").get_node("ItemList")
 	for i in range(len(des)):
 		if des[i]!=0:
 			itemlist.add_item(str(i))
+	while(itemlist.is_anything_selected ( )==false):
+		pass
 	var ItemNo = itemlist.get_selected_items()
-	var mon_des=itemlist.get_item_text(ItemNo)
+	var mon_des=itemlist.get_item_text(ItemNo[0])
+	global.controlMenuNode.socket.put_packet(("P %d %d %d"%[id,des[mon_des],mon_des]).to_ascii())
 	print(mon_des)
+	
+
