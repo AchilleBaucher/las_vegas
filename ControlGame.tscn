@@ -1,17 +1,21 @@
-[gd_scene load_steps=5 format=2]
+[gd_scene load_steps=7 format=2]
 
 [ext_resource path="res://ControlGame.gd" type="Script" id=1]
 [ext_resource path="res://Camera.gd" type="Script" id=2]
 [ext_resource path="res://Spatial.gd" type="Script" id=3]
 [ext_resource path="res://Dialog.gd" type="Script" id=6]
 
+[sub_resource type="Theme" id=1]
+
+[sub_resource type="StyleBoxEmpty" id=2]
+
 [node name="ControlGame" type="Control"]
 anchor_right = 1.0
 anchor_bottom = 1.0
-margin_left = 0.950073
-margin_top = 3.05
-margin_right = 0.950073
-margin_bottom = 3.04999
+margin_left = 1.90009
+margin_top = 2.10002
+margin_right = 1.90002
+margin_bottom = 2.10004
 script = ExtResource( 1 )
 __meta__ = {
 "_edit_use_anchors_": false
@@ -66,15 +70,21 @@ margin_left = 768.9
 margin_top = 64.8
 margin_right = 984.9
 margin_bottom = 132.8
+custom_colors/guide_color = Color( 0, 0, 0, 1 )
 max_text_lines = 6
 __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="TextEdit" type="TextEdit" parent="."]
-margin_left = 765.65
-margin_top = 37.85
-margin_right = 984.65
-margin_bottom = 61.85
+[node name="Label" type="Label" parent="."]
+margin_left = 770.9
+margin_top = 42.85
+margin_right = 987.9
+margin_bottom = 62.85
+theme = SubResource( 1 )
+custom_styles/normal = SubResource( 2 )
 text = "Choisis le numéro :"
+__meta__ = {
+"_edit_use_anchors_": false
+}
 [connection signal="pressed" from="ButtonMenu" to="." method="_on_ButtonMenu_pressed"]
