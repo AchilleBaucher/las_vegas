@@ -15,6 +15,7 @@
 #define MAXLINE 	1024
 #define NB_MAX_JOUEURS 2
 #define NB_CASINOS 6
+#define NB_MANCHES 4
 
 // <<<<<<<<<<<<<<<<<<<<<<<<<<<< Initialisation >>>>>>>>>>>>>>>>>>>>
 
@@ -31,7 +32,7 @@ struct _client
 
 // Nombre de joueurs participants
 int nb_clients;
-
+int manche_en_cours;
 // Un casino, contient ses billets et ses dés
 struct _casino
 {
@@ -43,6 +44,23 @@ struct _casino
     int rep_des[NB_MAX_JOUEURS];
 } casinos[NB_CASINOS];
 
+// Indique combien il reste de dés au total
+int nb_total_des()
+{
+    int sum = 0;
+    for(int i=0; i < nb_clients;i++)
+        sum+=tcpClients[i].nb_des;
+    return sum;
+}
+
+// Indique s'il reste au moins un dé en jeu
+int reste_un_de()
+{
+    for (size_t i = 0; i < nb_clients; i++)
+        if(tcpClients[i].nb_des != 0)
+            return 1;
+    return 0;
+}
 // Affiche tous les clients
 void printClients()
 {
@@ -266,11 +284,51 @@ void placer_des_casino(int id_j, int nb_d, int no_c)
 
 }
 
+
+// Démarre une nouvelle manche
+void nouvelle_manche()
+{
+    manche_en_cours++;
+    for(int i=0;i<nb_clients;i++)
+        sendMessageToGodotClient(tcpClients[i].ipAddress,tcpClients[i].port,"M");
+    distribuer_billets();
+    sendMessageToGodotClient(tcpClients[0].ipAddress,tcpClients[0].port,"T");
+}
+
+
+// Qui a le plus d'argent
+int gagnant()
+{
+    return 0;
+}
+
+// Fin de la partie, déclare le vainqueur
+void fin_partie()
+{
+    char reply[MAXLINE];
+    int g = gagnant();
+    sprintf(reply,"F%d",g);
+    for(int i=0;i<nb_clients;i++)
+        sendMessageToGodotClient(tcpClients[g].ipAddress,tcpClients[g].port,reply);
+}
+
 // Demande de à idj de lancer les dés
 void tour_suivant(int idj)
 {
-    sendMessageToGodotClient(tcpClients[idj].ipAddress,tcpClients[idj].port,"T");
+    if(reste_un_de())
+        sendMessageToGodotClient(tcpClients[idj].ipAddress,tcpClients[idj].port,"T");
+
+    // Manche suivante
+    else
+    {
+        // gains();
+        if(manche_en_cours!=4)
+            nouvelle_manche();
+        else
+            fin_partie();
+    }
 }
+
 
 
 // 0:attente, 1: en cours, 2:fin
@@ -415,10 +473,11 @@ int main()
                     // Le joueur id place nb_d dés sur le casino no_c
 					int id_j, nb_d, no_c;
 					sscanf(buffer,"P %d %d %d",&id_j,&nb_d,&no_c);
-                    printf("Recu de %d : mettre %d dés sur le casino %d\n",id_j,nb_d,no_c);
+                    printf("Recu de %d (%d dés) : mettre %d dés sur le casino %d\n",id_j,tcpClients[id_j].nb_des,nb_d,no_c);
                     // Cas d'erreur :
 					if(id_j!=id_joueur_en_cours)
 						sprintf(reply,"W Ce n'est pas à toi (%d) de lancer mais à %d",id_j, id_joueur_en_cours);
+
                     else if(nb_d > tcpClients[id_j].nb_des | nb_d < 1)
 						sprintf(reply,"W Nombre de dés (%d) incorrect",nb_d);
                     else if(no_c < 0 | no_c > NB_CASINOS)

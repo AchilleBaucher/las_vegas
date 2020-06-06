@@ -1,3 +1,6 @@
 /undo_capone/
 *.import
 images/*.xcf
+ex2_udpserver/udpclient
+ex2_udpserver/udpserver2
+

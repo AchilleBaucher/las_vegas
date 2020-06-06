@@ -20,7 +20,7 @@ func _networkMessage(mess):
 			
 		'T': # A mon tour, je lance les dés
 			var des =lancer_des()
-#			_on_ItemList_item_selected(des)
+			get_tree().get_root().get_node("ControlGame").get_node("ItemList").clear()
 			
 		'D': #Ajouter des dés à un casino
 			SpatialNode.add_des_cas(int(mess[1]),int(mess[2]),int(mess[3]))
@@ -45,26 +45,25 @@ func _on_ButtonMenu_pressed():
 func lancer_des():
 	# Tirer les dés
 	var des = [0,0,0,0,0,0]
-	var nb_d = 6 #SpatialNode.des_joueur.size()
+	var nb_d = SpatialNode.des_joueur.size()
 	
 	print("Tirer %d dés"%nb_d)
 	for i in range(nb_d):
 		des[randi()%6] += 1
 	var imax = 0
+	
+	var non_nuls =[]
 	for i in range(des.size()):
-		if des[i] > des[imax] :
-			imax = i
-			
+		if des[i] > 0 :
+			non_nuls.append(i+1)
+	
 	SpatialNode.afficher_des(des)
-	SpatialNode.remove_des(des,imax)
 	
-	return des
-	######Recuperer le choix du joueur####
+	var de_choisi = _on_ItemList_item_selected(des)-1
 	
-	# Pour l'instant envoyer au pif, changer bientot !#
-#	print ("sending UDP test data to "+global.ipAddress+" port 4242")
-	#global.controlMenuNode.socket.put_packet(("P %d %d %d"%[id,des[imax],imax]).to_ascii())
-
+	
+	SpatialNode.remove_des(des,de_choisi)
+	global.controlMenuNode.socket.put_packet(("P %d %d %d"%[id,des[de_choisi],de_choisi]).to_ascii())
 
 func createTile(x,y,tilenum):
 	# Create a new tile instance
@@ -113,14 +112,17 @@ func createExplorer(x,y,num):
 
 func _on_ItemList_item_selected(des):
 	var itemlist=get_tree().get_root().get_node("ControlGame").get_node("ItemList")
-	for i in range(len(des)):
+	for i in range(6):
 		if des[i]!=0:
-			itemlist.add_item(str(i))
+			itemlist.add_item(str(i+1))
+	
+	# On attend
 	while(itemlist.is_anything_selected ( )==false):
 		pass
+	
 	var ItemNo = itemlist.get_selected_items()
-	var mon_des=itemlist.get_item_text(ItemNo[0])
-	global.controlMenuNode.socket.put_packet(("P %d %d %d"%[id,des[mon_des],mon_des]).to_ascii())
-	print(mon_des)
+	
+	var mon_des=int(itemlist.get_item_text(ItemNo[0]))
+	return mon_des
 	
 
