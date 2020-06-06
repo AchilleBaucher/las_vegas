@@ -87,4 +87,7 @@ margin_top = 465.0
 margin_right = 75.0
 margin_bottom = 479.0
 text = "Score : 0"
+__meta__ = {
+"_edit_use_anchors_": false
+}
 [connection signal="pressed" from="ButtonMenu" to="." method="_on_ButtonMenu_pressed"]

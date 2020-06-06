@@ -30,7 +30,7 @@ func _networkMessage(mess):
 			
 		'R': #Récupérer un billet
 			SpatialNode.recup_billet(int(mess[1])-1)
-			score = score + (int(mess[1])+1)*10000
+			score = score + (int(mess[1]))*10000
 			get_tree().get_root().get_node("ControlGame").get_node("Score").set_text("Score : %d"%score)
 			
 		'M': # Nouvelle manche
@@ -40,6 +40,13 @@ func _networkMessage(mess):
 		'I' : # Set id
 			if id == -1:
 				id = int(mess[1])
+		'F': # 
+			var msg
+			if int(mess[1]):
+				 msg = "Score : %d VOUS AVEZ GAGNÉ "%score
+			else :
+				msg = "Score : %d VOUS AVEZ PERDU "%score
+			get_tree().get_root().get_node("ControlGame").get_node("Score").set_text(msg)
 
 func _on_ButtonMenu_pressed():
 	var root=get_tree().get_root()

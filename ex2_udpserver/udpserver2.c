@@ -13,9 +13,9 @@
 #define PORT	 	4242
 #define GODOT_PORT	4000
 #define MAXLINE 	1024
-#define NB_MAX_JOUEURS 1
+#define NB_MAX_JOUEURS 2
 #define NB_CASINOS 6
-#define NB_MANCHES 0
+#define NB_MANCHES 1
 
 // <<<<<<<<<<<<<<<<<<<<<<<<<<<< Initialisation >>>>>>>>>>>>>>>>>>>>
 
@@ -254,10 +254,10 @@ void gains()
 			indice_des[a] = a;
 		}
 
-        for (int y = 0; y < nb_clients; y++)
-		{
-			printf("Avant tri, Joueur %d a %d dés\n" , y, casinos[i].rep_des[y]);
-		}
+        // for (int y = 0; y < nb_clients; y++)
+		// {
+		// 	printf("Avant tri, Joueur %d a %d dés\n" , y, casinos[i].rep_des[y]);
+		// }
 
 		trie_selec_indice(casinos[i].rep_des, indice_des, nb_clients);
 
@@ -353,7 +353,7 @@ void tour_suivant(int idj)
     else
     {
         gains();
-        if(manche_en_cours!=4)
+        if(manche_en_cours!=NB_MANCHES)
             nouvelle_manche();
         else
             fin_partie();
@@ -447,8 +447,6 @@ int main()
 					sprintf(ilreste,"Z%d",NB_MAX_JOUEURS-nb_clients);
 					message_tous(ilreste);
 
-
-					statut_partie =1;//!\\
                     // Si le nombre est atteint, on commence
 					if(nb_clients >= NB_MAX_JOUEURS)
 					{
