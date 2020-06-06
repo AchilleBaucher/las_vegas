@@ -13,7 +13,7 @@
 #define PORT	 	4242
 #define GODOT_PORT	4000
 #define MAXLINE 	1024
-#define NB_MAX_JOUEURS 2
+#define NB_MAX_JOUEURS 1
 #define NB_CASINOS 6
 #define NB_MANCHES 3
 
@@ -174,9 +174,9 @@ void distribuer_billets()
 
 		// Tri par sélection des billets
 		int c;
-		for(int u=0;u<4;u++)
+		for(int u=0;u<NB_MAX_JOUEURS-1;u++)
 		{
-			for(int v=u+1;v<5;v++)
+			for(int v=u+1;v<NB_MAX_JOUEURS;v++)
 		    {
 		    	if ( casinos[i].billets[u] > casinos[i].billets[v] )
 		        {
@@ -186,7 +186,6 @@ void distribuer_billets()
 		        }
 		    }
 		}
-
 	}
 
     // Ceci fait, on envoie à tous les clients du jeu les nouveaux billets
@@ -274,11 +273,8 @@ void gains(int nb_client)
 			// On ajoute la valeur du score
 			tcpClients[indice_des[j]].score += casinos[i].billets[k];
 			k++;
-
 		}
-
 	}
-
 }
 
 // Place les nb_d dés du joueur id_j sur le casino no_c

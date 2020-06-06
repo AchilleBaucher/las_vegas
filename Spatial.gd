@@ -226,13 +226,12 @@ func remove_des(des,nombre):
 		remove_child(de)
 		des_joueur.erase(de)
 
-func recup_billet_cas(casino, billet):
-	billets_casinos[casino][billet].set_translation(Vector3(14,mes_billets.size()*0.1,-mes_billets.size()))
-	mes_billets.append(billets_casinos[casino][billet])
+func recup_billet(billet):
+	mes_billets.append(createBillet(14,mes_billets.size()*0.1,-mes_billets.size(),billet))
 
-func remove_billet_cas(casino, billet):
-	remove_child(billets_casinos[casino][billet])
-	billets_casinos[casino].erase(billets_casinos[casino][billet])
+#func remove_billet_cas(casino, billet):
+#	remove_child(billets_casinos[casino][billet])
+#	billets_casinos[casino].erase(billets_casinos[casino][billet])
 	
 func nouvelle_manche():
 	print("---------------- NOUVELLE MANCHE ----------------")

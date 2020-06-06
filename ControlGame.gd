@@ -2,9 +2,11 @@ extends Control
 
 var SpatialNode
 var id
+var score
 
 func _ready():
 	id = -1
+	score = 0
 	SpatialNode = get_tree().get_root().get_node("ControlGame").get_node("Spatial")
 	#get_tree().get_root().get_node("ControlGame").get_node("Spatial").get_node("TextEdit").remove_child() 
 	#get_tree().get_root().get_node("ControlGame").get_node("Spatial").get_node("ItemList").hide()
@@ -27,7 +29,9 @@ func _networkMessage(mess):
 			pass
 			
 		'R': #Récupérer un billet
-			SpatialNode.recup_billet_cas(int(mess[1]),int(mess[2]))
+			SpatialNode.recup_billet(int(mess[1]))
+			score = score + (int(mess[1])+1)*10000
+			get_tree().get_root().get_node("ControlGame").get_node("Score").set_text("Score : %d"%score)
 			
 		'M': # Reset la partie
 			SpatialNode.nouvelle_manche()
