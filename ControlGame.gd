@@ -27,13 +27,15 @@ func _networkMessage(mess):
 			pass
 			
 		'R': #Récupérer un billet
-			Spatial.recup_billet_cas(int(mess[1]),int(mess[2]))
-		'S':
-			pass
+			SpatialNode.recup_billet_cas(int(mess[1]),int(mess[2]))
+			
+		'M': # Reset la partie
+			SpatialNode.nouvelle_manche()
+			SpatialNode.creer_des(id)
+			
 		'I' : # Set id
 			if id == -1:
 				id = int(mess[1])
-				SpatialNode.creer_des(id)
 
 func _on_ButtonMenu_pressed():
 	var root=get_tree().get_root()
@@ -47,7 +49,7 @@ func lancer_des():
 	var des = [0,0,0,0,0,0]
 	var nb_d = SpatialNode.des_joueur.size()
 	
-	print("Tirer %d dés"%nb_d)
+#	print("Tirer %d dés"%nb_d)
 	for i in range(nb_d):
 		des[randi()%6] += 1
 	var imax = 0

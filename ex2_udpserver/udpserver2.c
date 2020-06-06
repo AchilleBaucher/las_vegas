@@ -15,7 +15,7 @@
 #define MAXLINE 	1024
 #define NB_MAX_JOUEURS 1
 #define NB_CASINOS 6
-#define NB_MANCHES 4
+#define NB_MANCHES 3
 
 // <<<<<<<<<<<<<<<<<<<<<<<<<<<< Initialisation >>>>>>>>>>>>>>>>>>>>
 
@@ -31,6 +31,8 @@ struct _client
 // Nombre de joueurs participants
 int nb_clients;
 int manche_en_cours;
+// 0:attente, 1: en cours, 2:fin
+int statut_partie;
 // Un casino, contient ses billets et ses dés
 struct _casino
 {
@@ -135,6 +137,19 @@ void sendMessageToGodotClient(char *hostname,int portno, char *mess)
 	close(socketGodot);
 }
 
+// Envoyer un message à id
+void message_to(int id,char *reply)
+{
+    sendMessageToGodotClient(tcpClients[id].ipAddress,tcpClients[id].port,reply);
+}
+
+// Envoyer un message à tous les clients
+void message_tous(char*reply)
+{
+    for(int i=0; i<nb_clients; i++)
+        message_to(i,reply);
+}
+
 // Distribue aléatoirement des billets sur chaque casino en début de partie
 void distribuer_billets()
 {
@@ -145,11 +160,12 @@ void distribuer_billets()
 	for (int i = 0; i<NB_CASINOS; i++)
 	{
 		total = 0;
+        casinos[i].nb_billets=0;
         // Tant qu'on es pas à plus de 50 000
 		for (int j=0;j<5 && total <5;j++)
 		{
             // On met un nouveau billet aléatoirement
-			casinos[i].billets[j]+=rand()%9+1;
+			casinos[i].billets[j]=rand()%9+1;
 			total+=casinos[i].billets[j];
 			casinos[i].nb_billets+=1;
 		}
@@ -196,7 +212,10 @@ void nouvelle_manche()
 {
     manche_en_cours++;
     for(int i=0;i<nb_clients;i++)
+    {
         sendMessageToGodotClient(tcpClients[i].ipAddress,tcpClients[i].port,"M");
+        tcpClients[i].nb_des = 8;
+    }
     distribuer_billets();
     sendMessageToGodotClient(tcpClients[0].ipAddress,tcpClients[0].port,"T");
 }
@@ -211,6 +230,7 @@ int gagnant()
 // Fin de la partie, déclare le vainqueur
 void fin_partie()
 {
+    statut_partie = 2;
     char reply[MAXLINE];
     int g = gagnant();
     sprintf(reply,"F%d",g);
@@ -234,11 +254,6 @@ void tour_suivant(int idj)
             fin_partie();
     }
 }
-
-
-
-// 0:attente, 1: en cours, 2:fin
-int statut_partie;
 
 int main()
 {
@@ -325,17 +340,14 @@ int main()
                     // Indiquer à chacun combien il reste de joueurs pour commencer
                     char ilreste[MAXLINE];
 					sprintf(ilreste,"Z%d",NB_MAX_JOUEURS-nb_clients);
-					for(int i=0; i<nb_clients; i++)
-					{
-						sendMessageToGodotClient(tcpClients[i].ipAddress,tcpClients[i].port,ilreste);
-					}
+					message_tous(ilreste);
 
                     // Si le nombre est atteint, on commence
 					if(nb_clients >= NB_MAX_JOUEURS)
 					{
 						statut_partie =1;
-						distribuer_billets();
-                        tour_suivant(0);					}
+						nouvelle_manche();
+                    }
 
                     break;
 

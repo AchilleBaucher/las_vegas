@@ -174,7 +174,7 @@ func poscasinos(num):
 
 # Ajouter un billet billet au casino num
 func add_billet_cas(num, billet):
-	print("ajouter le billet "+String(billet)+" au casino "+String(num))
+#	print("ajouter le billet "+String(billet)+" au casino "+String(num))
 	var posx = 4
 	var posy = -(billets_casinos[num].size()+1)*0.01
 	var posz = poscasinos(num)+billets_casinos[num].size()*2 - 2
@@ -184,7 +184,7 @@ func add_billet_cas(num, billet):
 # Ajouter un nombre de dés des d'un joueur joueur au casino casino
 func add_des_cas(joueur, des, casino):
 	for d in range(des):
-		print("Ajouter %d dés au casino %d pour le joueur %d"%[des,casino,joueur])
+#		print("Ajouter %d dés au casino %d pour le joueur %d"%[des,casino,joueur])
 		var posx = 1-des_casinos[casino].size()*1.2
 		var posy = 1
 		var posz = poscasinos(casino)
@@ -193,7 +193,7 @@ func add_des_cas(joueur, des, casino):
 
 # Affiche le résultat du tirage
 func afficher_des(des):
-	print("Afficher la répartition")
+#	print("Afficher la répartition")
 	var cpt = 0
 	for i in range(des.size()):
 		for j in range(des[i]):
@@ -212,7 +212,7 @@ func roterde(de,nombre):
 		6 : de.set_rotation(Vector3(-PI/2,0,0))
 
 func remove_des(des,nombre):
-	print("Retirer les dés numéro %d +1 = %d"%[nombre,nombre+1])
+#	print("Retirer les dés numéro %d +1 = %d"%[nombre,nombre+1])
 	var to_erase = []
 	var cpt = 0
 	for i in range(des.size()):
@@ -221,7 +221,7 @@ func remove_des(des,nombre):
 				to_erase.append(des_joueur[cpt])
 			cpt+=1
 	
-	print("Donc retirer %d dés "%to_erase.size())
+#	print("Donc retirer %d dés "%to_erase.size())
 	for de in to_erase:
 		remove_child(de)
 		des_joueur.erase(de)
@@ -233,6 +233,18 @@ func recup_billet_cas(casino, billet):
 func remove_billet_cas(casino, billet):
 	remove_child(billets_casinos[casino][billet])
 	billets_casinos[casino].erase(billets_casinos[casino][billet])
+	
+func nouvelle_manche():
+	print("---------------- NOUVELLE MANCHE ----------------")
+	for c in billets_casinos :
+		for billet in c :
+			remove_child(billet)
+	billets_casinos = [[],[],[],[],[],[]]
+	
+	for c in des_casinos :
+		for de in c :
+			remove_child(de)
+	des_casinos = [[],[],[],[],[],[]]
 	
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 #func _process(delta):
