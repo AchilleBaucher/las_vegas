@@ -21,7 +21,7 @@ __meta__ = {
 script = ExtResource( 3 )
 
 [node name="Camera" type="Camera" parent="Spatial"]
-transform = Transform( -8.68431e-08, -0.846091, 0.533038, -1.37846e-07, 0.533038, 0.846091, -1, -2.91323e-13, -1.62921e-07, 9.99092, 10, 0 )
+transform = Transform( -8.68431e-08, -0.846091, 0.533038, -1.37846e-07, 0.533038, 0.846091, -1, 0, -1.62921e-07, 13.3021, 15.6199, 0 )
 script = ExtResource( 2 )
 
 [node name="Board" type="MeshInstance" parent="Spatial"]

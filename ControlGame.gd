@@ -20,7 +20,7 @@ func _networkMessage(mess):
 			
 		'T': # A mon tour, je lance les dés
 			var des =lancer_des()
-			_on_ItemList_item_selected(des)
+#			_on_ItemList_item_selected(des)
 			
 		'D': #Ajouter des dés à un casino
 			SpatialNode.add_des_cas(int(mess[1]),int(mess[2]),int(mess[3]))
