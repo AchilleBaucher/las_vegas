@@ -45,22 +45,6 @@ __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="ButtonTest" type="Button" parent="."]
-anchor_left = 0.484
-anchor_top = 0.141
-anchor_right = 0.484
-anchor_bottom = 0.141
-margin_left = 21.5797
-margin_top = -75.6022
-margin_right = 494.58
-margin_bottom = -55.6022
-action_mode = 0
-text = "test"
-__meta__ = {
-"_edit_use_anchors_": false,
-"_editor_description_": ""
-}
-
 [node name="ItemList" type="ItemList" parent="."]
 margin_left = 768.9
 margin_top = 64.8
