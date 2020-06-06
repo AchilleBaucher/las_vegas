@@ -392,6 +392,8 @@ int main()
 			{
 
 				case 'X' ://Distribtion des gains
+					sprintf(reply,"Voilà tes gains : \n");
+                    sendMessageToGodotClient(addresse_client,port_client,reply);
 					gains(2);
 					casinos[0].rep_des[0] = 4;
 					casinos[0].rep_des[1] = 4;
@@ -399,9 +401,6 @@ int main()
 						casinos[0].rep_des[0] = 0;
 						casinos[0].rep_des[0] = 0;
 					}
-
-                	sprintf(reply,"Tiens voilà tes billets");
-                    sendMessageToGodotClient(addresse_client,port_client,reply);
                     break;
 
 
