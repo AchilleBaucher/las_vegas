@@ -80,7 +80,7 @@ func createCasino(posx,posy,posz,imgName):
 	mi.set_translation(Vector3(posx,posy,posz))
 	
 	# Récupérer le maillage de l'objet
-	var meshObj = load("res://carteCasino.obj")
+	var meshObj = load("res://blender/casino03.obj")
 	mi.mesh = meshObj
 	
 	# Associer une surface à la carte
@@ -105,7 +105,7 @@ func createBillet(posx,posy,posz,nombre):
 	mi.set_translation(Vector3(posx,posy,posz))
 	
 	# Récupérer le maillage de l'objet
-	var meshObj = load("res://carteCasino.obj")
+	var meshObj = load("res://blender/billet01.obj")
 	mi.mesh = meshObj
 	
 	# Associer une surface à la carte
@@ -148,16 +148,16 @@ func createDe(posx,posy,posz,couleur,nombre):
 # <<<<<<<<<<<<<<<<<<<<<<<<<<<<< AUTRES FONCTIONS >>>>>>>>>>>>>>>>>>>>>>>>>>>>
 # Position par défaut d'un casino en fonction de son numéro
 func poscasinos(num):
-	return 10*num-30	
+	return 12*num-45	
 
 # Ajouter un billet billet au casino num
 func add_billet_cas(num, billet):
 	print("ajouter le billet "+String(billet)+" au casino "+String(num))
-	var posx = 3
-	var posy = 0
-	var posz = poscasinos(num)+billets_casinos[num].size()*2
+	var posx = 4
+	var posy = -(billets_casinos[num].size()+1)*0.01
+	var posz = poscasinos(num)+billets_casinos[num].size()*2 - 2
 	billets_casinos[num].append(createBillet(posx,posy,posz,billet))
-	billets_casinos[num][billets_casinos[num].size()-1].set_rotation(Vector3(0,PI/2,0))
+#	billets_casinos[num][billets_casinos[num].size()-1].set_rotation(Vector3(0,PI/2,0))
 	
 
 # Ajouter un nombre de dés des d'un joueur joueur au casino casino
