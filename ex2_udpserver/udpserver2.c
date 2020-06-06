@@ -41,6 +41,23 @@ struct _casino
     int rep_des[NB_MAX_JOUEURS];
 } casinos[NB_CASINOS];
 
+// Indique combien il reste de dés au total
+int nb_total_des(int nb_clients)
+{
+    int sum = 0;
+    for(int i=0; i < nb_clients;i++)
+        sum+=tcpClients[i].nb_des;
+    return sum;
+}
+
+// Indique s'il reste au moins un dé en jeu
+int reste_un_de(int nb_clients)
+{
+    for (size_t i = 0; i < nb_clients; i++)
+        if(tcpClients[i].nb_des != 0)
+            return 1;
+    return 0;
+}
 // Affiche tous les clients
 void printClients()
 {
@@ -173,9 +190,12 @@ void placer_des_casino(int id_j, int nb_d, int no_c)
 }
 
 // Demande de à idj de lancer les dés
-void tour_suivant(int idj)
+void tour_suivant(int idj,int nb_clients)
 {
-    sendMessageToGodotClient(tcpClients[idj].ipAddress,tcpClients[idj].port,"T");
+    if(reste_un_de(nb_clients))
+        sendMessageToGodotClient(tcpClients[idj].ipAddress,tcpClients[idj].port,"T");
+    // else
+    //     gains(nb_clients)
 }
 
 
@@ -277,7 +297,7 @@ int main()
 					{
 						statut_partie =1;
 						distribuer_billets();
-                        tour_suivant(0);					}
+                        tour_suivant(0,nb_clients);					}
 
                     break;
 
@@ -327,7 +347,7 @@ int main()
     						sendMessageToGodotClient(tcpClients[i].ipAddress,tcpClients[i].port,des_ajoutes);
     					}
                         id_joueur_en_cours = (id_joueur_en_cours+1)%nb_clients;
-                        tour_suivant(id_joueur_en_cours);
+                        tour_suivant(id_joueur_en_cours,nb_clients);
                     }
 				    break;
 
