@@ -78,4 +78,3 @@ margin_right = 984.65
 margin_bottom = 61.85
 text = "Choisis le numéro :"
 [connection signal="pressed" from="ButtonMenu" to="." method="_on_ButtonMenu_pressed"]
-[connection signal="item_activated" from="ItemList" to="." method="_on_ItemList_item_activated"]
