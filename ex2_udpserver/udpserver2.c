@@ -304,10 +304,11 @@ int main()
                     // Le joueur id place nb_d dés sur le casino no_c
 					int id_j, nb_d, no_c;
 					sscanf(buffer,"P %d %d %d",&id_j,&nb_d,&no_c);
-                    printf("Recu de %d : mettre %d dés sur le casino %d\n",id_j,nb_d,no_c);
+                    printf("Recu de %d (%d dés) : mettre %d dés sur le casino %d\n",id_j,tcpClients[id_j].nb_des,nb_d,no_c);
                     // Cas d'erreur :
 					if(id_j!=id_joueur_en_cours)
 						sprintf(reply,"W Ce n'est pas à toi (%d) de lancer mais à %d",id_j, id_joueur_en_cours);
+
                     else if(nb_d > tcpClients[id_j].nb_des | nb_d < 1)
 						sprintf(reply,"W Nombre de dés (%d) incorrect",nb_d);
                     else if(no_c < 0 | no_c > NB_CASINOS)

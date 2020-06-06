@@ -58,8 +58,7 @@ func lancer_des():
 	
 	SpatialNode.afficher_des(des)
 	
-	var choix = _on_ItemList_item_selected(des)-1
-	print("J'ai choisi %d "%choix)
+	_on_ItemList_item_selected(des)-1
 	
 	
 #	SpatialNode.remove_des(des,imax)
@@ -131,9 +130,10 @@ func _on_ItemList_item_selected(des):
 	var ItemNo = itemlist.get_selected_items()
 	print("J'ai choisi qqh")
 	
-	var mon_des=itemlist.get_item_text(ItemNo[0])
-	print("J'ai choisi ")
-	global.controlMenuNode.socket.put_packet(("P %d %d %d"%[id,des[mon_des],mon_des]).to_ascii())
+	var mon_des=int(itemlist.get_item_text(ItemNo[0]))
+	print("J'ai choisi %d"%mon_des)
+	print(des)
+	global.controlMenuNode.socket.put_packet(("P %d %d %d"%[id,des[mon_des-1],mon_des-1]).to_ascii())
 	print(mon_des)
 	
 
