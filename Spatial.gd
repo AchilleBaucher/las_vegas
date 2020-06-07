@@ -183,7 +183,7 @@ func add_billet_cas(num, billet):
 
 # Ajouter un nombre de dés des d'un joueur joueur au casino casino
 func add_des_cas(joueur, des, casino):
-	for d in range(des):
+	for _d in range(des):
 #		print("Ajouter %d dés au casino %d pour le joueur %d"%[des,casino,joueur])
 		var posx = 1-des_casinos[casino].size()*1.2
 		var posy = 1
@@ -216,7 +216,7 @@ func remove_des(des,nombre):
 	var to_erase = []
 	var cpt = 0
 	for i in range(des.size()):
-		for j in range(des[i]):
+		for _j in range(des[i]):
 			if i == nombre:
 				to_erase.append(des_joueur[cpt])
 			cpt+=1

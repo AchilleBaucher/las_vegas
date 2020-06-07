@@ -11,9 +11,8 @@
 #include <time.h>
 
 #define PORT	 	4242
-#define GODOT_PORT	4000
 #define MAXLINE 	1024
-#define NB_MAX_JOUEURS 2
+#define NB_MAX_JOUEURS 5
 #define NB_CASINOS 6
 #define NB_MANCHES 2
 
@@ -33,6 +32,7 @@ struct _client
 // Nombre de joueurs participants
 int nb_clients;
 int manche_en_cours;
+int nb_joueurs;
 // 0:attente, 1: en cours, 2:fin
 int statut_partie;
 // Un casino, contient ses billets et ses dés
@@ -350,12 +350,17 @@ void tour_suivant(int idj)
     }
 }
 
-int main()
+int main(int argc, char** argv)
 {
 
     // <<<<<<<<<<<<<<< Initialisation >>>>>>>>>>>>>>
 
 	// Initialisation des valeurs
+    nb_joueurs = NB_MAX_JOUEURS;
+    if(argc>1)
+        nb_joueurs = atoi(argv[1]);
+    printf("Partie lancee avec %d joueurs\n",nb_joueurs);
+
 	statut_partie = 0;
 	nb_clients = 0;
 	int id_joueur_en_cours = 0;
@@ -434,11 +439,11 @@ int main()
 
                     // Indiquer à chacun combien il reste de joueurs pour commencer
                     char ilreste[MAXLINE];
-					sprintf(ilreste,"Z%d",NB_MAX_JOUEURS-nb_clients);
+					sprintf(ilreste,"Z%d",nb_joueurs-nb_clients);
 					message_tous(ilreste);
 
                     // Si le nombre est atteint, on commence
-					if(nb_clients >= NB_MAX_JOUEURS)
+					if(nb_clients >= nb_joueurs)
 					{
 						statut_partie =1;
 						nouvelle_manche();

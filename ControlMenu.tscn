@@ -5,36 +5,67 @@
 [node name="ControlMenu" type="Control"]
 anchor_right = 1.0
 anchor_bottom = 1.0
+margin_left = 1.0
+margin_top = -4.0
+margin_right = 1.0
+margin_bottom = -4.0
 script = ExtResource( 1 )
 __meta__ = {
 "_edit_use_anchors_": false
 }
 
 [node name="ButtonJouer" type="Button" parent="."]
-margin_right = 12.0
-margin_bottom = 20.0
+margin_left = 467.0
+margin_top = 216.0
+margin_right = 557.0
+margin_bottom = 261.0
 text = "Jouer"
 __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="ButtonOptions" type="Button" parent="."]
-margin_top = 40.0
-margin_right = 12.0
-margin_bottom = 60.0
-text = "Options"
+[node name="ButtonGo" type="Button" parent="."]
+margin_left = 95.0
+margin_top = 29.0
+margin_right = 155.0
+margin_bottom = 54.0
+text = "OK"
 __meta__ = {
 "_edit_use_anchors_": false
 }
 
 [node name="ButtonTestReseau" type="Button" parent="."]
-margin_top = 80.0
-margin_right = 86.0
-margin_bottom = 100.0
+margin_left = 11.0
+margin_top = 101.0
+margin_right = 97.0
+margin_bottom = 121.0
 text = "Test réseau"
 __meta__ = {
 "_edit_use_anchors_": false
 }
+
+[node name="PortNumber" type="SpinBox" parent="."]
+margin_left = 7.0
+margin_top = 30.0
+margin_right = 81.0
+margin_bottom = 54.0
+min_value = 4000.0
+max_value = 4010.0
+value = 4000.0
+__meta__ = {
+"_edit_use_anchors_": false,
+"_editor_description_": ""
+}
+
+[node name="ChoosePort" type="Label" parent="."]
+margin_left = 9.0
+margin_top = 8.0
+margin_right = 479.0
+margin_bottom = 30.0
+text = "Choose a PORT, different from others if you play on the same computer, then press OK and then ou can play"
+__meta__ = {
+"_edit_use_anchors_": false
+}
 [connection signal="pressed" from="ButtonJouer" to="." method="_on_ButtonJouer_pressed"]
-[connection signal="pressed" from="ButtonOptions" to="." method="_on_ButtonOptions_pressed"]
+[connection signal="pressed" from="ButtonGo" to="." method="_on_ButtonOptions_pressed"]
 [connection signal="pressed" from="ButtonTestReseau" to="." method="_on_ButtonTestReseau_pressed"]

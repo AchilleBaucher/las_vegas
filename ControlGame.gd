@@ -21,7 +21,7 @@ func _networkMessage(mess):
 			SpatialNode.add_billet_cas(int(mess[1]),int(mess[2])-1)
 			
 		'T': # A mon tour, je lance les dés
-			var des =lancer_des()
+			lancer_des()
 			get_tree().get_root().get_node("ControlGame").get_node("ItemList").clear()
 			
 		'D': #Ajouter des dés à un casino
@@ -61,9 +61,8 @@ func lancer_des():
 	var nb_d = SpatialNode.des_joueur.size()
 	
 #	print("Tirer %d dés"%nb_d)
-	for i in range(nb_d):
+	for _i in range(nb_d):
 		des[randi()%6] += 1
-	var imax = 0
 	
 	var non_nuls =[]
 	for i in range(des.size()):
@@ -78,7 +77,7 @@ func lancer_des():
 	SpatialNode.remove_des(des,de_choisi)
 	global.controlMenuNode.socket.put_packet(("P %d %d %d"%[id,des[de_choisi],de_choisi]).to_ascii())
 
-func createTile(x,y,tilenum):
+func createTile(x,y):
 	# Create a new tile instance
 	var mi=MeshInstance.new()
 	# and translate it to its final position
@@ -100,7 +99,7 @@ func createTile(x,y,tilenum):
 	$Spatial.add_child(mi)
 	return mi
 	
-func createExplorer(x,y,num):
+func createExplorer(x,y):
 	# Create a new tile instance
 	var mi=MeshInstance.new()
 	# and translate it to its final position
